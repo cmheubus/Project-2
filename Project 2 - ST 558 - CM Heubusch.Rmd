@@ -1,28 +1,52 @@
 ---
 title: "Project 2 - ST 558 - CM Heubusch"
-output: html_document
+output: 
+  html_document:
+    toc: yes
+    depth: 2
 ---
-test123 456
+# Introduction
+
+*You should have an introduction section that describes the data, the purpose of your analysis, and the
+methods you’ll use (roughly - more detail can be given later in the document).*
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
-## R Markdown
+# Data 
+*You should briefly describe the data and the variables you have to work with (no need to discuss all of them,
+just the ones you want to use).
+You should randomly sample from (say using sample()) the (Monday) data in order to form a training (70%
+of the data) and test set (30% of the data). You should set the seed to make your work reproducible.*
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+39645 observations
+```{r Read in Dataset}
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+# Summarizations
+*You should produce some basic (but meaningful) summary statistics about the training data you are working
+with. The GENERAL things that the plots describe should be explained but, since we are going to automate
+things, there is no need to try and explain particular trends in the plots you see (unless you want to try and
+automate that too!).*
 
-You can also embed plots, for example:
+# Modeling
+*You should fit two types of models to predict the shares. One model should be an ensemble model (bagged
+trees, random forests, or boosted trees) and one should be a linear regression model (or collection of them
+that you’ll choose from).*
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+*The article referenced in the UCI website mentions that they made the problem into a binary classification
+problem by dividing the shares into two groups (< 1400 and >=1400), you can do this if you’d like or simply
+try to predict the shares themselves.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Feel free to use code similar to the notes or use the caret package.
+
+After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
+preferred method (all on the training data set only!) you should then compare them on the test set. Your
+methodology for choosing your model during the training phase should be explained.* 
+
+# Automation
+*Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build
+process that will cycle through the weekday_is_* variables.*
+*... adding a loop?*
