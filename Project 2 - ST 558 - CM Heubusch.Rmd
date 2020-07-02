@@ -10,8 +10,9 @@ output:
 methods you’ll use (roughly - more detail can be given later in the document).*
 
 ```{r setup, include=FALSE}
-library(tidyverse)
 library(GGally)
+library(corrplot)
+library(tidyverse)
 ```
 
 # Data 
@@ -22,6 +23,8 @@ The [**Online News Popularity** data set](https://archive.ics.uci.edu/ml/dataset
 * num_hrefs - *"number of links" in the article*  
 * num_imgs - *"number of images"*  
 * num_videos - *"number of videos"*  
+* average_token_length - *average word length in the article*
+* num_keywords - *how many keywords are included in the metadata, an important factor for search engine optimization*
 * data_channel_is_* variables - *six binary variables, indicating whether the observation is included in a particular channel. Each article appears to only be attributed to either one channel, or no channel/another channel (perhaps smaller) that was not accounted for with these binary variables*  
 * global_rate_positive_words - *"rate of positive words in the content," or rather, the ratio of positive:total words in the article*  
 * global_rate_negative_words - *"rate of negative words in the content," the complement to global_rate_positive_words*  
@@ -31,94 +34,104 @@ The **weekday_is_** variables will be our means of creating six separate reports
 ## Reading in the Dataset 
 ```{r Reading in Dataset}
 newsData <- read.csv(file="/Users/christinemarieheubusch/Project-2/OnlineNewsPopularity/OnlineNewsPopularity.csv")
-str(newsData)
+
+newsData <- newsData %>% select(-url, -timedelta)
+#str(newsData)
 head(newsData)
 ```
-## Creating New Column Using `Mutate`
 
+## Creating New Column Using `Mutate`
 I was intrigued by the **data_channel_is_** columns in the set, so I decided to figure out a way to combine these columns into a single **channel** column with the `mutate()`function. Working off a [StackOverflow example](https://stackoverflow.com/questions/55126134/nested-ifelse-statement-with-multiple-columns), I used [`dplyr::case_when`](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/case_when) to assign values based upon the values within the from the six **data_channel_is_** columns. 
 
 I then realized that not every article was associated with a channel; so I used the [`replace_na()` function](https://tidyr.tidyverse.org/reference/replace_na.html) from the `tidyr` package to replace NAs with "Other". (This is an assumption on my end - it's possible that some articles are not assigned to any channel.)
 
 I finished this by converting the values of the **channel** column to factors, removing the URL column (since it will not be used in any calculations), and removed the old **data_channel_is_** columns, for a new total of 55 columns for the dataset. I can now use this column for categorical variables. 
 ```{r Creating the **channel** Column and Removing **url**}
-newsData <- newsData %>% 
-            mutate(channel = case_when(
-               data_channel_is_bus == 1 ~ "Business",
-               data_channel_is_entertainment == 1 ~ "Entertainment",
-               data_channel_is_lifestyle == 1 ~ "Lifestyle",
-               data_channel_is_socmed == 1 ~ "SocialMedia",
-               data_channel_is_tech == 1 ~ "Tech",
-               data_channel_is_world == 1 ~ "World"
-               ))
-newsData$channel <- replace_na(newsData$channel, "Other")
-newsData$channel <- as.factor(newsData$channel) #Converting to factor
-newsData <- newsData %>%
-            select(-url, -starts_with("data_channel_is_")) 
-            #Removing url column and old **data_channel_is_** columns
+#newsData <- newsData %>% 
+#            mutate(channel = case_when(
+#               data_channel_is_bus == 1 ~ "Business",
+#               data_channel_is_entertainment == 1 ~ "Entertainment",
+#               data_channel_is_lifestyle == 1 ~ "Lifestyle",
+#               data_channel_is_socmed == 1 ~ "SocialMedia",
+#               data_channel_is_tech == 1 ~ "Tech",
+#               data_channel_is_world == 1 ~ "World"
+#               ))
+#newsData$channel <- replace_na(newsData$channel, "Other")
+#newsData$channel <- as.factor(newsData$channel) #Converting to factor
+#newsData <- newsData %>%
+#            select(-url, -timedelta, -starts_with("data_channel_is_")) 
+            #Removing non-predictive columns of url and timedelta, as well as old **data_channel_is_** columns
 #view(newsData)
 ```
 
 ## Splitting the Data 
-
-Per the project directions, I then split the data, using `sample()`, with 70% of the data going to the training set (**newsDataTrain**) and 30% going to the test set (**newsDataTest**).
+Per the project directions, I then split the data, using `sample()`, with 70% of the data going to the training set (4,662 observations, **newsDataTrain**) and 30% going to the test set (1,999 observations, **newsDataTest**).
 ```{r Split the Data into Train and Test}
 newsData <- newsData %>% filter(weekday_is_monday==1)
 #MAKE THE SHARES INTO A BINARY VARIABLE, if desired 
 #NEED TO FIND A WAY TO AUTOMATE THIS FOR EACH DAY - likely a loop?
 #colnames(newsData)
-set.seed(789) #seed set to make it reproducible
+set.seed(789) #Setting seed to make it reproducible
 train <- sample(1:nrow(newsData), size=nrow(newsData)*0.7)
 test <- dplyr::setdiff(1:nrow(newsData), train)
 newsDataTrain <- newsData[train,]
 newsDataTest <- newsData[test,]
-view(newsDataTrain)
-view(newsDataTest)
+#view(newsDataTrain)
+#view(newsDataTest)
 ```
 
 # Summarizations
-
 *You should produce some basic (but meaningful) summary statistics about the training data you are working
 with. The GENERAL things that the plots describe should be explained but, since we are going to automate
 things, there is no need to try and explain particular trends in the plots you see (unless you want to try and
 automate that too!).*
 
 ## Calculating Summary Statistics for Variables
-```{r Calculating Summary Statistics for Numeric Variables}
-#NOT GETTING THE VARIABLE NAMES? 
-for (i in seq_along(newsDataTrain)[1:dim(newsDataTrain)[2]]) { 
-  print(apply(X=newsDataTrain), MARGIN=2, 
-        FUN=summary, na.rm=TRUE)
-}
+I then used the `summary()` function to calculate summary statistics for each of the quantitative variables in the dataset, including Min, 1st Quartile, Median, Mean, 3rd Quartile, and Max. For the one categorical variable I created (**channel**), it has calculated the frequency of each type of channel. 
+```{r Calculating Summaries of Each Variable}
+summary(newsDataTrain)
+```
+
+I further explored the data by looking at a correlations plot with the variables I had expressed interest in previously. Looking at the result, I do not see a substantial relationship between any one variable and the target variable of **shares** - those values are extremely faded and therefore represent weak relationships. However, I do note some correlation between other variables, suggesting that there may be an interaction between them. For example, the highest correlation coefficient value is r=0.45, when looking at num_hrefs and n_tokens_content. This does seem to make practical sense; the more words you have, the more likely you'll include more links. Perhaps less intuitive is the relationship between num_imgs and num_hrefs, with the second-highest correlation coefficient of r=0.36.
+
+```{r Creating Correlation Plot with ALL Variables}
+#newsCorrelation1 <- cor(newsDataTrain[,1:53])
+#corrplot(newsCorrelation1, method="number")
+#SEEMS LIKE RESULTS WOULD BE DIFFICULT TO SCALE/THE PLOT WOULD LOOK RIDICULOUS? 
+#CAN I NARROW DOWN THE VARIABLES JUST BY HOW I "FEEL" ABOUT THEM?
+```
+
+
+```{r Creating Correlation Plot with Only Some Variables}
+newsCorrelation <- cor(newsDataTrain[,c("n_tokens_title","n_tokens_content", "num_hrefs", "num_imgs", "num_videos", "average_token_length", "num_keywords", "global_rate_positive_words", "global_rate_negative_words", "shares")])
+corrplot(newsCorrelation, method="number", number.cex=0.65)
+```
+
+```{r }
+keywordSharePlot <- ggplot(newsDataTrain, aes(x=n_tokens_content, y=shares))
+keywordSharePlot + geom_point()
 ```
 
 ```{r}
-#ggpairs(newsDataTrain) #VERY computationally expensive
+#imgSharePlot<- ggplot(newsDataTrain, aes(x=num_imgs, y=shares))
+#imgSharePlot + geom_point(position="jitter") + 
+#  facet_wrap(~channel)
 ```
 
-## Calculating Correlation between Variables
-```{r Calculating Correlation between Variables}
-#cor(newsData$num_imgs, newsData$num_keywords) #r=0.11451
-#cor(newsData$num_imgs, newsData$num_hrefs) #r=0.3394686
-cor(newsData$shares, newsData$num_imgs)
-cor(newsData$shares, newsData$n_tokens_title)
-cor(newsData$shares, newsData$num_hrefs)
-cor(newsData$shares, newsData$n_tokens_content)
+```{r GGPairs, message=FALSE}
+newsDataTrain %>% ggpairs(newsDataTrain, 
+                          columns = c("n_tokens_title", "n_tokens_content", "num_imgs", "num_videos",    
+                                      "shares"))
 ```
 
-```{r Creating Boxplots}
-#g <- ggplot(newsData, aes(x=num_imgs, y=shares))
-#g + geom_boxplot() #says I need to use `aes(group=...)`
+```{r}
+#g1 <- ggplot(newsDataTrain, aes(x=channel, y=n_tokens_title))
+#g1 + geom_boxplot()
 ```
 
-```{r Creating Facet Grid or Wrap}
-#g <- ggplot(newsData, aes(x=num_imgs, y=shares))
-#g + geom_point() #Any categorical variable we can add for a `facet_grid` or `facet_wrap`?
-```
-
-```{r ggpairs}
-#ggpairs(newsDataTest) #VERY LARGE
-#If we wanted to use, would need 
+For fun
+```{r}
+#newsDataTrain %>% group_by(channel) %>% summarise("Average Words Per Article"=mean(n_tokens_content))
 ```
 
 # Modeling
@@ -127,9 +140,92 @@ that you’ll choose from).The article referenced in the UCI website mentions th
 
 Feel free to use code similar to the notes or use the caret package.
 
+
 ```{r}
-lm(shares~ . + .^2, data=newsDataTrain) #INCLUDES QUADRATICS, BUT NOT INTERACTIONS
+dataFitAll <- lm(shares~., data=newsDataTrain) 
+#INCLUDES ALL MAIN EFFECTS, BUT DOES NOT INCLUDE INTERACTIONS OR QUADRATICS
+summary(dataFitAll)
 ```
+
+When we look at the results of this multiple linear regression, we see that the Adjusted R-square values is a very low **0.05065**, but we do see that the F-statistic is 6.075, with a very small p-value; it appears that the F-test is significant, in turn suggesting that the model is significant - but we don't know which variables are significant.  To try to determine this, we can examine the resulting p-values of each variable. With an alpha value of 0.01, the following variables are considered significant:
+* n_tokens_title  
+* num_hrefs  
+* num_imgs  
+* average_token_length  
+* **kw_avg_max**  
+* **kw_min_avg**  
+* **kw_max_avg**  
+* **kw_avg_avg**  
+* **LDA_00**  
+* **global_subjectivity**  
+* **min_positive_polarity**  
+* channelOther  
+* channelWorld  
+
+In reducing the variables, I'm conducting a **backwards selection** - starting with all variables, and then narrowing them down based upon p-value. However, incorporating only these 13 variables into the model reduces the adjusted R-square to just **0.05097**, the smallest of improvements. We again have a large F-statistic (15.73) with a small p-value (< 2.2e-16). 
+```{r}
+dataFit12 <- lm(shares~n_tokens_title +
+        num_hrefs + 
+        num_imgs + 
+        average_token_length + 
+        kw_avg_max + 
+        kw_max_avg + 
+        kw_min_avg + 
+        kw_avg_avg +
+        LDA_00 +
+        global_subjectivity + 
+        min_positive_polarity +
+        channel,
+      data=newsDataTrain)
+summary(dataFit12)
+```
+
+```{r}
+dataFit11 <- lm(shares~n_tokens_title +
+        num_imgs + 
+        average_token_length + 
+        kw_avg_max + 
+        kw_max_avg + 
+        kw_min_avg + 
+        kw_avg_avg +
+        LDA_00 +
+        global_subjectivity + 
+        min_positive_polarity +
+        channel,
+      data=newsDataTrain)
+summary(dataFit11)
+```
+
+Now, I'm going to remove the four variables that are NOT significant, and conduct another linear regression.
+
+```{r}
+dataFit9 <- lm(shares~n_tokens_title +
+        kw_avg_max + 
+        kw_max_avg + 
+        kw_min_avg + 
+        kw_avg_avg +
+        LDA_00 +
+        global_subjectivity + 
+        min_positive_polarity +
+        channel,
+      data=newsDataTrain)
+summary(dataFit9)
+```
+
+
+```{r}
+dataFit9Interaction <- lm(shares~(n_tokens_title +
+        kw_avg_max +
+        kw_max_avg +
+        kw_min_avg + 
+        kw_avg_avg +
+        LDA_00 +
+        global_subjectivity + 
+        min_positive_polarity)^2,
+      data=newsDataTrain)
+summary(dataFit9Interaction)
+```
+
 
 After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
 preferred method (all on the TRAINING data set only!) you should then compare them on the test set. Your methodology for choosing your model during the training phase should be explained.* 
