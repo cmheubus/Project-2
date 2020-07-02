@@ -1,0 +1,22 @@
+---
+title: "Project 2 - Sandbox"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(GGally)
+```
+
+```{r Read in Dataset}
+newsData <- read.csv(file="/Users/christinemarieheubusch/Project-2/OnlineNewsPopularity/OnlineNewsPopularity.csv")
+str(newsData)
+head(newsData)
+```
+
+```{r Trying to Make Shares Column Binary}
+newsData$shares <- mutate(newsData, shares =
+            ifelse(shares<1400, "<1400"),
+                   ifelse(shares>=1400, ">=1400"))
+head(newsData)
+```

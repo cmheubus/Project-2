@@ -5,48 +5,137 @@ output:
     toc: yes
     depth: 2
 ---
-# Introduction
-
+# Introduction - **NEEDS TO BE COMPLETED**
 *You should have an introduction section that describes the data, the purpose of your analysis, and the
 methods you’ll use (roughly - more detail can be given later in the document).*
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(GGally)
 ```
 
 # Data 
-*You should briefly describe the data and the variables you have to work with (no need to discuss all of them,
-just the ones you want to use).
-You should randomly sample from (say using sample()) the (Monday) data in order to form a training (70%
-of the data) and test set (30% of the data). You should set the seed to make your work reproducible.*
+## Describing the Data & Variables
+The [**Online News Popularity** data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity#) describes two years' worth of articles that were published on [Mashable](https://mashable.com/). In total, the data set consists of 39,644 observations, with 61 columns of different variables. In examining the variables, I was particularly intrigued by the following:  
+* n_tokens_title - *"number of words in the title"*  
+* n_tokens_content - *"number of words in the content"*  
+* num_hrefs - *"number of links" in the article*  
+* num_imgs - *"number of images"*  
+* num_videos - *"number of videos"*  
+* data_channel_is_* variables - *six binary variables, indicating whether the observation is included in a particular channel. Each article appears to only be attributed to either one channel, or no channel/another channel (perhaps smaller) that was not accounted for with these binary variables*  
+* global_rate_positive_words - *"rate of positive words in the content," or rather, the ratio of positive:total words in the article*  
+* global_rate_negative_words - *"rate of negative words in the content," the complement to global_rate_positive_words*  
 
-39645 observations
-```{r Read in Dataset}
+The **weekday_is_** variables will be our means of creating six separate reports. They are binary variables, so their value is either 0 (for No, not published that day of the week) or 1 (Yes, published that day). **weekday_is_weekend** encompasses all articles published on either Saturday or Sunday. 
 
+## Reading in the Dataset 
+```{r Reading in Dataset}
+newsData <- read.csv(file="/Users/christinemarieheubusch/Project-2/OnlineNewsPopularity/OnlineNewsPopularity.csv")
+str(newsData)
+head(newsData)
+```
+## Creating New Column Using `Mutate`
+
+I was intrigued by the **data_channel_is_** columns in the set, so I decided to figure out a way to combine these columns into a single **channel** column with the `mutate()`function. Working off a [StackOverflow example](https://stackoverflow.com/questions/55126134/nested-ifelse-statement-with-multiple-columns), I used [`dplyr::case_when`](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8/topics/case_when) to assign values based upon the values within the from the six **data_channel_is_** columns. 
+
+I then realized that not every article was associated with a channel; so I used the [`replace_na()` function](https://tidyr.tidyverse.org/reference/replace_na.html) from the `tidyr` package to replace NAs with "Other". (This is an assumption on my end - it's possible that some articles are not assigned to any channel.)
+
+I finished this by converting the values of the **channel** column to factors, removing the URL column (since it will not be used in any calculations), and removed the old **data_channel_is_** columns, for a new total of 55 columns for the dataset. I can now use this column for categorical variables. 
+```{r Creating the **channel** Column and Removing **url**}
+newsData <- newsData %>% 
+            mutate(channel = case_when(
+               data_channel_is_bus == 1 ~ "Business",
+               data_channel_is_entertainment == 1 ~ "Entertainment",
+               data_channel_is_lifestyle == 1 ~ "Lifestyle",
+               data_channel_is_socmed == 1 ~ "SocialMedia",
+               data_channel_is_tech == 1 ~ "Tech",
+               data_channel_is_world == 1 ~ "World"
+               ))
+newsData$channel <- replace_na(newsData$channel, "Other")
+newsData$channel <- as.factor(newsData$channel) #Converting to factor
+newsData <- newsData %>%
+            select(-url, -starts_with("data_channel_is_")) 
+            #Removing url column and old **data_channel_is_** columns
+#view(newsData)
+```
+
+## Splitting the Data 
+
+Per the project directions, I then split the data, using `sample()`, with 70% of the data going to the training set (**newsDataTrain**) and 30% going to the test set (**newsDataTest**).
+```{r Split the Data into Train and Test}
+newsData <- newsData %>% filter(weekday_is_monday==1)
+#MAKE THE SHARES INTO A BINARY VARIABLE, if desired 
+#NEED TO FIND A WAY TO AUTOMATE THIS FOR EACH DAY - likely a loop?
+#colnames(newsData)
+set.seed(789) #seed set to make it reproducible
+train <- sample(1:nrow(newsData), size=nrow(newsData)*0.7)
+test <- dplyr::setdiff(1:nrow(newsData), train)
+newsDataTrain <- newsData[train,]
+newsDataTest <- newsData[test,]
+view(newsDataTrain)
+view(newsDataTest)
 ```
 
 # Summarizations
+
 *You should produce some basic (but meaningful) summary statistics about the training data you are working
 with. The GENERAL things that the plots describe should be explained but, since we are going to automate
 things, there is no need to try and explain particular trends in the plots you see (unless you want to try and
 automate that too!).*
 
-# Modeling
-*You should fit two types of models to predict the shares. One model should be an ensemble model (bagged
-trees, random forests, or boosted trees) and one should be a linear regression model (or collection of them
-that you’ll choose from).*
+## Calculating Summary Statistics for Variables
+```{r Calculating Summary Statistics for Numeric Variables}
+#NOT GETTING THE VARIABLE NAMES? 
+for (i in seq_along(newsDataTrain)[1:dim(newsDataTrain)[2]]) { 
+  print(apply(X=newsDataTrain), MARGIN=2, 
+        FUN=summary, na.rm=TRUE)
+}
+```
 
-*The article referenced in the UCI website mentions that they made the problem into a binary classification
-problem by dividing the shares into two groups (< 1400 and >=1400), you can do this if you’d like or simply
-try to predict the shares themselves.
+```{r}
+#ggpairs(newsDataTrain) #VERY computationally expensive
+```
+
+## Calculating Correlation between Variables
+```{r Calculating Correlation between Variables}
+#cor(newsData$num_imgs, newsData$num_keywords) #r=0.11451
+#cor(newsData$num_imgs, newsData$num_hrefs) #r=0.3394686
+cor(newsData$shares, newsData$num_imgs)
+cor(newsData$shares, newsData$n_tokens_title)
+cor(newsData$shares, newsData$num_hrefs)
+cor(newsData$shares, newsData$n_tokens_content)
+```
+
+```{r Creating Boxplots}
+#g <- ggplot(newsData, aes(x=num_imgs, y=shares))
+#g + geom_boxplot() #says I need to use `aes(group=...)`
+```
+
+```{r Creating Facet Grid or Wrap}
+#g <- ggplot(newsData, aes(x=num_imgs, y=shares))
+#g + geom_point() #Any categorical variable we can add for a `facet_grid` or `facet_wrap`?
+```
+
+```{r ggpairs}
+#ggpairs(newsDataTest) #VERY LARGE
+#If we wanted to use, would need 
+```
+
+# Modeling
+*You should fit two types of models to predict the shares. One model should be an ensemble model (bagged trees, random forests, or boosted trees) and one should be a linear regression model (or collection of them
+that you’ll choose from).The article referenced in the UCI website mentions that they made the problem into a binary classification problem by dividing the shares into two groups (< 1400 and >=1400), you can do this if you’d like or simply try to predict the shares themselves*
 
 Feel free to use code similar to the notes or use the caret package.
 
+```{r}
+lm(shares~ . + .^2, data=newsDataTrain) #INCLUDES QUADRATICS, BUT NOT INTERACTIONS
+```
+
 After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
-preferred method (all on the training data set only!) you should then compare them on the test set. Your
-methodology for choosing your model during the training phase should be explained.* 
+preferred method (all on the TRAINING data set only!) you should then compare them on the test set. Your methodology for choosing your model during the training phase should be explained.* 
+
+
 
 # Automation
-*Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build
-process that will cycle through the weekday_is_* variables.*
+Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build process that will cycle through the weekday_is_* variables.
 *... adding a loop?*
