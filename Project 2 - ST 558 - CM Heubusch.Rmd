@@ -1,13 +1,12 @@
 ---
 title: "Project 2 - ST 558 - CM Heubusch"
-output: 
-  html_document:
-    toc: yes
-    depth: 4
+date: "July 3, 2020"
+output: rmarkdown::github_document
+params: 
+  rmarkdown::render("/Users/christinemarieheubusch/Project-2/Project 2 - ST 558 - CM Heubusch.Rmd",
+  params=list(dplyr::select(starts_with("weekday_is_"))))
 ---
-# Introduction - **NEEDS TO BE COMPLETED**
-*You should have an introduction section that describes the data, the purpose of your analysis, and the
-methods you’ll use (roughly - more detail can be given later in the document).*
+# Introduction - 
 
 ## Purpose of Analysis 
 The [**Online News Popularity** data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity#) describes two years' worth of articles that were published on [Mashable](https://mashable.com/). The purpose of this analysis is to create linear and  ensemble models by which we can best predict the number of shares an article on the website will receive. Mashable staff and other online publishers may be interested in this data, as it could help them determine what kind of content will be most popular. 
@@ -73,9 +72,7 @@ view(newsData)
 ```
 
 ```{r Filter for Just Monday Data}
-newsData <- newsData %>% filter(weekday_is_monday==1)
-#NEED TO FIND A WAY TO AUTOMATE THIS FOR EACH DAY - likely a loop?
-#colnames(newsData)
+#newsData <- newsData %>% filter(weekday_is_monday==1)
 ```
 
 Per the project directions, I began by splitting the data, using `sample()`, with 70% of the data going to the training set (4,662 observations, **newsDataTrain**) and 30% going to the test set (1,999 observations, **newsDataTest**).
@@ -100,7 +97,7 @@ automate that too!).*
 ## Calculating Summary Statistics for Variables
 I then used the `summary()` function to calculate summary statistics for each of the quantitative variables in the dataset, including Min, 1st Quartile, Median, Mean, 3rd Quartile, and Max. For the one categorical variable I created (**channel**), it has calculated the frequency of each type of channel. 
 ```{r Calculating Summaries of Each Variable, echo=false}
-summary(newsDataTrain)
+#summary(newsDataTrain)
 ```
 
 I further explored the data by looking at a correlations plot with the variables I had expressed interest in previously. I divided the variables into different chunks, to make the plots easier to view. I excluded **weekday_is** variables, as I felt they would only be used for the final creation of the reports, as opposed to being involved in the model. I used the code from our notes *(Module 7 - Summarizing Data/Quantitative Summaries)* for this purpose. 
@@ -350,8 +347,8 @@ Of all the models: **dataFitAll** has the highest Adjusted R-square value(0.0506
 Of the models I created, the one with the most variables (**dataFit11**) has the highest Adjusted R-square value (0.02365) and lowest AIC (97775.44). 
 
 ## Creating Multiple Linear Regression Model Using the 16 Significant Predictive Variables
-Though not covered in the class notes, I decided to experiment with a slightly different approach. Working off the model that fits all main effect, I tried to reduce the number of variables using **backwards selection** - starting with all variables, and then narrowing them down based upon p-value.
-```{r}
+Though not covered in the class notes, I decided to experiment with a slightly different approach. Working off the model that fits all main effects, I tried to reduce the number of variables using backwards selection - starting with all variables, and then narrowing them down based upon p-value.
+```{r MLR with 16 Significant Predictive Variables}
 dataFitSignif16 <- lm(shares~n_tokens_title +
         num_imgs + 
         average_token_length + 
@@ -397,9 +394,9 @@ AIC(dataFitSignif14)
 However, even though the result returned indicates that all variables are significant at the alpha=0.05 level, this model reduced the Adjusted R-square to **0.05055098**. I will not be further reducing this model and would prefer to use the previous model, with the higher Adjusted R-square value (**dataFit16**).
 
 #### Comparing Root MSE 
-While the fit statistics are one way to determine which model is best, **prediction error** is actually preferred. After looking at several options, I decided to use cross-validation, per the HW 9 prediction key from Ari. With this approach, which uses 10 folds, I was able to calculate the Root Mean Square Error for the two models on the Training set.  
+While the fit statistics are one way to determine which model is best, **prediction error** is actually preferred. After looking at several options, I decided to use cross-validation, per the HW 9 prediction key from Avy. With this approach, which uses 10 folds, I was able to calculate the Root Mean Square Error for the two models on the Training set.  
 
-```{r}
+```{r Comparing Root MSE with Training Data}
 control <- trainControl(method="cv", number=10)
 fit11Train <- train(as.formula(dataFit11), data=newsDataTrain, method="lm", trControl=control)
 fit11Train$results$RMSE
@@ -417,29 +414,30 @@ fitSignif16Test$results$RMSE
 ```
 We see that the model **fitSignif16Test** has a lower RSME for both the Training and Test set; therefore, when looking at our linear models, we would choose this one.
 
-## Creating Model with Random Forest
+## Creating Ensemble Model with Random Forest
+Since we're focusing on prediction when it comes to the accuracy of our models, I decided to use the random forest method for my ensemble learning method. As noted in my introduction, the random forest method tends to be a superior verison of the bagging method for bootstrap aggregation, as it helps avoid . For this purpose, I was originally going to use the `caret` package, as demonstrated in Homework 12; however, the computation time was VERY long, and I found that the `randomForest()` function from the `randomForest` package to be more efficient.
 
+```{r Caret Package with Repeated Cross Validation}
+#trctrl <- trainControl(method="repeatedcv", number=10, repeats=3)
+#set.seed(1)
+#rfNewsDataFitCaret <- train(shares~., data=newsDataTrain, method="rf",
+#                            trainControl=trctrl,
+#                            preProcess = c("center", "scale"))
+```
 
-```{r}
+As suggested in the notes (and confirmed by this [Duke ArcToolbox Fit Random Forest Model resource](http://code.env.duke.edu/projects/mget/export/HEAD/MGET/Trunk/PythonPackage/dist/TracOnlineDocumentation/Documentation/ArcGISReference/RandomForestModel.FitToArcGISTable.html)), the `mtry` option helps us get a smaller number of predictors, with the default number being the total number of predictor variables divided by three. 
+```{r Ensemble Model with randomForest Function}
 rfNewsDataFit <- randomForest(shares~., data=newsDataTrain, mtry=ncol(newsDataTrain)/3, ntree=200, importance=TRUE)
 ```
 
-```{r}
-trctrl <- trainControl(method="repeatedcv", number=10, repeats=3)
-set.seed(1)
-rfNewsDataFitCaret <- train(shares ~., data=newsDataTrain, method="knn",
-                            trainControl=trctrl,
-                            preProcess = c("center", "scale"))
-```
-
-```{r}
+```{r Predicting Using the Random Forest Model}
 rfNewsDataPred <- predict(rfNewsDataFit, newdata=newsDataTest)
-fit16NewPred <- predict(dataFit16, newdata=newsDataTest)
+fit16NewPred <- predict(dataFitSignif16, newdata=newsDataTest)
 ```
 
-## Comparing Two Models with Root MSE
+## Comparing Two Models on Test Data Set
 
-I compared the random forest model to  to our linear model from before, **dataFit16**. To determine which model is preferrable, we can compare the root MSE values. 
+I compared the random forest model to  to our linear model from before, **dataFit16**. To compare the two models and determine which is preferrable, I calculated the root MSE values on the Test dataset that I created earlier. 
 ```{r Calculating Root MSE values}
 rfRMSE <- sqrt(mean((rfNewsDataPred-newsDataTest$shares)^2))
 rfRMSE
@@ -448,10 +446,7 @@ datafit16RMSE <- sqrt(mean((fit16NewPred-newsDataTest$shares)^2))
 datafit16RMSE
 ```
 
-BOTH models have a very similar RMSE. A lower RSME is preferred; in this case, the linear regression model - **dataFit16** - is considered a better fit than the random forest option.
-
-After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
-preferred method (all on the TRAINING data set only!) you should then compare them on the test set. Your methodology for choosing your model during the training phase should be explained.* 
+Both models have a very similar RMSE. A lower RSME is preferred; in this case, the linear regression model - **dataFit16** - is considered a better fit than the random forest option.
 
 # Automation
 Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build process that will cycle through the weekday_is_* variables.

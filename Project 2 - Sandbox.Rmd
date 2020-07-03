@@ -79,3 +79,10 @@ compareAdjR2 <- function(x,...) {
 
 This line may be written as:
 **Estimated Shares = (n_tokens_title)(1.314e+02) + (num_imgs)(2.473e+01) + (average_token_length)(-3.080e+02) + (kw_avg_max)(-2.175e-01) + (kw_max_avg)(-2.175e-01) + (kw_min_avg)(-6.433e-01) + (kw_avg_avg)(2.055e+00) + (LDA_00)(2.488e+03) + (global_subjectivity)(5.931e+03) + (min_positive_polarity)(-4.452e+03) + (data_channel_is_lifestyle)(-2.650e+03) + (data_channel_is_entertainment)(-2.935e+03) + (data_channel_is_bus)(-3.624e+03) + (data_channel_is_socmed)(-2.718e+03) + (data_channel_is_tech)(-2.321e+03) + (data_channel_is_world)(-1.863e+03)**
+
+
+output: 
+  html_document:
+    toc: yes
+    depth: 4
+
