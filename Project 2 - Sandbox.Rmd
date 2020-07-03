@@ -14,9 +14,41 @@ str(newsData)
 head(newsData)
 ```
 
+
 ```{r Trying to Make Shares Column Binary}
 newsData$shares <- mutate(newsData, shares =
             ifelse(shares<1400, "<1400"),
                    ifelse(shares>=1400, ">=1400"))
 head(newsData)
+```
+
+I ended up just using the `summary()` function instead... seemed to work and even included the variable names??
+```{r Calculating Summary Statistics for Numeric Variables}
+#NOT GETTING THE VARIABLE NAMES? 
+for (i in seq_along(newsDataTrain)[1:dim(newsDataTrain)[2]]) { 
+  print(apply(X=newsDataTrain), MARGIN=2, 
+        FUN=summary, na.rm=TRUE)
+}
+```
+
+```{r}
+plot(newsDataTrain[,c("n_tokens_title", "num_hrefs", "shares")])
+```
+
+```{r Creating the **channel** Column and Removing **url**}
+#newsData <- newsData %>% 
+#            mutate(channel = case_when(
+#               data_channel_is_bus == 1 ~ "Business",
+#               data_channel_is_entertainment == 1 ~ "Entertainment",
+#               data_channel_is_lifestyle == 1 ~ "Lifestyle",
+#               data_channel_is_socmed == 1 ~ "SocialMedia",
+#               data_channel_is_tech == 1 ~ "Tech",
+#               data_channel_is_world == 1 ~ "World"
+#               ))
+#newsData$channel <- replace_na(newsData$channel, "Other")
+#newsData$channel <- as.factor(newsData$channel) #Converting to factor
+#newsData <- newsData %>%
+#            select(-url, -timedelta, -starts_with("data_channel_is_")) 
+            #Removing non-predictive columns of url and timedelta, as well as old **data_channel_is_** columns
+#view(newsData)
 ```
