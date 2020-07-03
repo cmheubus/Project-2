@@ -22,6 +22,12 @@ newsData$shares <- mutate(newsData, shares =
 head(newsData)
 ```
 
+```{r}
+#imgSharePlot<- ggplot(newsDataTrain, aes(x=num_imgs, y=shares))
+#imgSharePlot + geom_point(position="jitter") + 
+#  facet_wrap(~channel)
+```
+
 I ended up just using the `summary()` function instead... seemed to work and even included the variable names??
 ```{r Calculating Summary Statistics for Numeric Variables}
 #NOT GETTING THE VARIABLE NAMES? 
@@ -33,6 +39,15 @@ for (i in seq_along(newsDataTrain)[1:dim(newsDataTrain)[2]]) {
 
 ```{r}
 plot(newsDataTrain[,c("n_tokens_title", "num_hrefs", "shares")])
+```
+
+```{r}
+newsDataTrain %>% group_by(channel) %>% summarise("Average Words Per Article"=mean(n_tokens_content))
+```
+
+```{r}
+#g1 <- ggplot(newsDataTrain, aes(x=channel, y=n_tokens_title))
+#g1 + geom_boxplot()
 ```
 
 ```{r Creating the **channel** Column and Removing **url**}

@@ -4,20 +4,16 @@ output:
   html_document:
     toc: yes
     depth: 2
+
 ---
 # Introduction - **NEEDS TO BE COMPLETED**
 *You should have an introduction section that describes the data, the purpose of your analysis, and the
 methods you’ll use (roughly - more detail can be given later in the document).*
 
-```{r setup, include=FALSE}
-library(caret)
-library(corrplot)
-library(GGally)
-library(randomForest)
-library(tidyverse)
-```
+## Purpose of Analysis 
 
-# Data 
+## Methods Used
+
 ## Describing the Data & Variables
 The [**Online News Popularity** data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity#) describes two years' worth of articles that were published on [Mashable](https://mashable.com/). In total, the data set consists of 39,644 observations, with 61 columns of different variables. In examining the variables, I was particularly intrigued by the following:  
 * n_tokens_title - *"number of words in the title"*  
@@ -31,12 +27,20 @@ The [**Online News Popularity** data set](https://archive.ics.uci.edu/ml/dataset
 * global_rate_positive_words - *"rate of positive words in the content," or rather, the ratio of positive:total words in the article*  
 * global_rate_negative_words - *"rate of negative words in the content," the complement to global_rate_positive_words*  
 
-The **weekday_is_** variables will be our means of creating six separate reports. They are binary variables, so their value is either 0 (for No, not published that day of the week) or 1 (Yes, published that day). **weekday_is_weekend** encompasses all articles published on either Saturday or Sunday. 
+The **weekday_is_** variables will be our means of creating seven separate reports. They are binary variables, so their value is either 0 (for No, not published that day of the week) or 1 (Yes, published that day). **weekday_is_weekend** is 1 if the article was published on *either* Saturday or Sunday. 
 
-## Reading in the Dataset 
+# Loading Packages & Reading in the Dataset 
+```{r setup, include=FALSE}
+library(caret)
+library(corrplot)
+library(GGally)
+library(randomForest)
+library(tidyverse)
+```
+
 ```{r Reading in Dataset}
 newsData <- read.csv(file="/Users/christinemarieheubusch/Project-2/OnlineNewsPopularity/OnlineNewsPopularity.csv")
-
+#Removing URL and timedelta columns, since these variables are non-predictive.
 newsData <- newsData %>% select(-url, -timedelta)
 #str(newsData)
 head(newsData)
@@ -49,28 +53,27 @@ I then realized that not every article was associated with a channel; so I used 
 
 I finished this by converting the values of the **channel** column to factors, removing the URL column (since it will not be used in any calculations), and removed the old **data_channel_is_** columns, for a new total of 55 columns for the dataset. I can now use this column for categorical variables. 
 ```{r Creating the **channel** Column and Removing **url**}
-#newsData <- newsData %>% 
-#            mutate(channel = case_when(
-#               data_channel_is_bus == 1 ~ "Business",
-#               data_channel_is_entertainment == 1 ~ "Entertainment",
-#               data_channel_is_lifestyle == 1 ~ "Lifestyle",
-#               data_channel_is_socmed == 1 ~ "SocialMedia",
-#               data_channel_is_tech == 1 ~ "Tech",
-#               data_channel_is_world == 1 ~ "World"
-#               ))
-#newsData$channel <- replace_na(newsData$channel, "Other")
-#newsData$channel <- as.factor(newsData$channel) #Converting to factor
+newsData <- newsData %>% 
+            mutate(channel = case_when(
+               data_channel_is_bus == 1 ~ "Business",
+               data_channel_is_entertainment == 1 ~ "Entertainment",
+               data_channel_is_lifestyle == 1 ~ "Lifestyle",
+               data_channel_is_socmed == 1 ~ "SocialMedia",
+               data_channel_is_tech == 1 ~ "Tech",
+               data_channel_is_world == 1 ~ "World"
+               ))
+newsData$channel <- replace_na(newsData$channel, "Other")
+newsData$channel <- as.factor(newsData$channel) #Converting to factor
 #newsData <- newsData %>%
 #            select(-url, -timedelta, -starts_with("data_channel_is_")) 
             #Removing non-predictive columns of url and timedelta, as well as old **data_channel_is_** columns
-#view(newsData)
+view(newsData)
 ```
 
 ## Splitting the Data 
 Per the project directions, I then split the data, using `sample()`, with 70% of the data going to the training set (4,662 observations, **newsDataTrain**) and 30% going to the test set (1,999 observations, **newsDataTest**).
 ```{r Split the Data into Train and Test}
 newsData <- newsData %>% filter(weekday_is_monday==1)
-#MAKE THE SHARES INTO A BINARY VARIABLE, if desired 
 #NEED TO FIND A WAY TO AUTOMATE THIS FOR EACH DAY - likely a loop?
 #colnames(newsData)
 set.seed(789) #Setting seed to make it reproducible
@@ -81,6 +84,8 @@ newsDataTest <- newsData[test,]
 #view(newsDataTrain)
 #view(newsDataTest)
 ```
+
+Now let's see if any of the variables that intrigued me should be included in my multiple linear regression.
 
 # Summarizations
 *You should produce some basic (but meaningful) summary statistics about the training data you are working
@@ -94,43 +99,77 @@ I then used the `summary()` function to calculate summary statistics for each of
 summary(newsDataTrain)
 ```
 
-I further explored the data by looking at a correlations plot with the variables I had expressed interest in previously. Looking at the result, I do not see a substantial relationship between any one variable and the target variable of **shares** - those values are extremely faded and therefore represent weak relationships. However, I do note some correlation between other variables, suggesting that there may be an interaction between them. For example, the highest correlation coefficient value is r=0.45, when looking at num_hrefs and n_tokens_content. This does seem to make practical sense; the more words you have, the more likely you'll include more links. Perhaps less intuitive is the relationship between num_imgs and num_hrefs, with the second-highest correlation coefficient of r=0.36.
-```{r Creating Correlation Plot with ALL Variables}
-newsCorrelation1 <- cor(newsDataTrain[,1:53])
-corrplot(newsCorrelation1, method="number")
-#SEEMS LIKE RESULTS WOULD BE DIFFICULT TO SCALE/THE PLOT WOULD LOOK RIDICULOUS? 
-#CAN I NARROW DOWN THE VARIABLES JUST BY HOW I "FEEL" ABOUT THEM?
+I further explored the data by looking at a correlations plot with the variables I had expressed interest in previously. I divided the variables into different chunks, to make the plots easier to view. I excluded **weekday_is** variables, as I felt they would only be used for the final creation of the reports, as opposed to being involved in the model. I used the code from our notes *(Module 7 - Summarizing Data/Quantitative Summaries)* for this purpose. 
+
+## Creating First Correlation Plot with First 10 Variables
+```{r Creating First Correlation Plot with First 10 Variables}
+newsCorrelation1 <- cor(newsData[,c(1:10, 59)])
+corrplot(newsCorrelation1, type="upper", method="number", tl.pos="lt", number.cex=0.5)
+corrplot(newsCorrelation1, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
+```
+## Creating Second Correlation Plot with Other Variables
+```{r Creating Second Correlation Plot with Other Variables}
+newsCorrelation2 <- cor(newsData[,c(11:20, 59)])
+
+corrplot(newsCorrelation2, type="upper", method="number", tl.pos="lt", number.cex=0.5)
+corrplot(newsCorrelation2, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
+```
+## Creating Third Correlation Plot
+```{r Creating Third Correlation Plot}
+newsCorrelation3 <- cor(newsData[,c(21:28, 59)]) #excluding "weekday_is variables"
+corrplot(newsCorrelation3, type="upper", method="number", tl.pos="lt", number.cex=0.5)
+corrplot(newsCorrelation3, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
+```
+## Creating Fourth Correlation Plot
+```{r Creating Fourth Correlation Plot}
+newsCorrelation4 <- cor(newsData[,c(38:47, 59)]) #excluding "weekday_is" variables
+corrplot(newsCorrelation4, type="upper", method="number", tl.pos="lt", number.cex=0.5)
+corrplot(newsCorrelation4, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
+```
+## Creating Fifth Correlation Plot
+```{r Creating Fifth Correlation Plot}
+newsCorrelation5 <- cor(newsData[,c(48:58, 59)]) #excluding "weekday_is" variables
+corrplot(newsCorrelation5, type="upper", method="number", tl.pos="lt", number.cex=0.5)
+corrplot(newsCorrelation5, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-
+## Creating Extra Correlation Plot
+I also created an extra correlation plot, to examine some variables that I had taken an interest in, where I thought there could be relationships between the predictor variables. I thought these would be of interest, as perhaps the number of keywords in the metadata would affect likelihood of someone finding the article through SEO (and then sharing it); or maybe social media users would gravitate towards longer/shorter titles, longer/shorter articles, longer/short words, articles with more negative words, and/or articles that have more links, images, or videos.  
 ```{r Creating Correlation Plot with Only Some Variables}
-newsCorrelation <- cor(newsDataTrain[,c("n_tokens_title","n_tokens_content", "num_hrefs", "num_imgs", "num_videos", "average_token_length", "num_keywords", "global_rate_positive_words", "global_rate_negative_words", "shares")])
-corrplot(newsCorrelation, method="number", number.cex=0.65)
+newsCorrelation6 <- cor(newsData[,c("num_keywords", "n_tokens_title","n_tokens_content", "num_hrefs", "num_imgs", "num_videos", "average_token_length", "num_keywords", "global_rate_positive_words", "global_rate_negative_words", "shares")])
+corrplot(newsCorrelation6, type="upper", method="number", tl.pos="lt", number.cex=0.5)
+corrplot(newsCorrelation6, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-```{r Plot with Only n_tokens_content and shares}
-keywordSharePlot <- ggplot(newsDataTrain, aes(x=n_tokens_content, y=shares))
-keywordSharePlot + geom_point()
+Unfortunately,looking at these six plots, I do not see a substantial relationship between any one variable and the target variable of **shares** - those low values all appear faded on the correlation plots, representing weak relationships. However, with my final plot I do note some correlation between other variables, suggesting that there may be interactions between them. For example, the highest correlation coefficient value is r=0.45, when looking at num_hrefs and n_tokens_content. This does seem to make practical sense; the more words you have, the more likely you'll need to include more links. Perhaps less intuitive is the relationship between num_imgs and num_hrefs, with the second-highest correlation coefficient of r=0.36.
+
+I then created a boxplot showing the shares, classified by the categorical variable of channel that I had created. The summary data (which included all channels) indicated that the median number of shares was around 1400 shares per article, though numerous outliers skew this significantly, so that the mean was 3436 shares. Looking at the plots, there do not seem to be dramatic differences in the data based upon which channel an article has been classified under. 
+```{r Creating Boxplot of Shares, by Channel}
+channelsBoxplot <- ggplot(newsDataTrain, aes(x=channel, y=shares))
+channelsBoxplot + geom_boxplot()
 ```
 
-```{r GGPairs, message=FALSE}
-newsDataTrain %>% ggpairs(newsDataTrain, 
-                          columns = c("n_tokens_title", "n_tokens_content", "num_imgs", "num_videos",    
-                                      "shares"))
+## Creating `ggpairs` Plots
+I also created two sets of ggpairs plots, to look at possible relationships in a different way. I again used the variables I looked at in the sixth correlation plot from above. 
+```{r ggpairs1, message=FALSE}
+newsData %>% select("num_keywords", "n_tokens_title","n_tokens_content", "num_hrefs", "num_imgs", "shares") %>% ggpairs()
 ```
 
-```{r}
-#g1 <- ggplot(newsDataTrain, aes(x=channel, y=n_tokens_title))
-#g1 + geom_boxplot()
+```{r ggpairs2, message=FALSE}
+newsData %>% select("num_videos", "average_token_length", "num_keywords", "global_rate_positive_words", "global_rate_negative_words", "shares") %>% ggpairs()
 ```
 
-```{r}
-#newsDataTrain %>% group_by(channel) %>% summarise("Average Words Per Article"=mean(n_tokens_content))
-```
 
 # Modeling
-*You should fit two types of models to predict the shares. One model should be an ensemble model (bagged trees, random forests, or boosted trees) and one should be a linear regression model (or collection of them
-that you’ll choose from).The article referenced in the UCI website mentions that they made the problem into a binary classification problem by dividing the shares into two groups (< 1400 and >=1400), you can do this if you’d like or simply try to predict the shares themselves*
+
+## Multiple Linear Regression
+While all the correlations are still very weak, I'm going to try several different combinations of variables that exhibit the highest correlations to our target variable of shares. 
+
+```{r}
+
+```
+
+
 
 Feel free to use code similar to the notes or use the caret package.
 
@@ -206,6 +245,11 @@ dataFit14 <- lm(shares~n_tokens_title +
         data_channel_is_world,
       data=newsDataTrain)
 summary(dataFit14)
+```
+
+```{r}
+residuals <- resid(dataFit16)
+plot(residuals)
 ```
 
 ```{r}
