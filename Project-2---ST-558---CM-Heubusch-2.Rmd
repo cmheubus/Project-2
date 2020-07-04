@@ -2,7 +2,6 @@
 title: "Project 2 - ST 558 - CM Heubusch 2"
 date: "July 3, 2020"
 output: rmarkdown::github_document
-
 ---
 
 ```{r Loading Packages, include=FALSE}
@@ -14,8 +13,6 @@ library(MuMIn)
 library(randomForest)
 library(tidyverse)
 ```
-
-
 
 # Introduction 
 
@@ -74,7 +71,7 @@ view(newsData)
 ```
 
 ```{r Filter by Day}
-#newsData <- newsData %>% filter(weekday_is_monday==1) #Original filtering for just Monday data.
+newsData <- newsData %>% filter(weekday_is_monday==1) #Original filtering for just Monday data.
 #newsData <- filter(newsData, (params$day==1))
 ```
 
@@ -450,5 +447,7 @@ datafit16RMSE
 Both models have a very similar RMSE. A lower RSME is preferred; in this case, the linear regression model - **dataFit16** - is considered a better fit than the random forest option.
 
 # Automation
-Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build process that will cycle through the weekday_is_* variables.
-*... adding a loop?* SEE MODULE 8
+*I was unable to complete the automation component of this assignment. Instead, I knit 7 separate reports.*
+
+# Conclusions
+

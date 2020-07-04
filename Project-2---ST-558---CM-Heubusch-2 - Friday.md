@@ -232,7 +232,7 @@ view(newsData)
 ```
 
 ``` r
-#newsData <- newsData %>% filter(weekday_is_monday==1) #Original filtering for just Monday data.
+newsData <- newsData %>% filter(weekday_is_friday==1) #Original filtering for just Monday data.
 #newsData <- filter(newsData, (params$day==1))
 ```
 
@@ -412,81 +412,81 @@ summary(dataFitAll)
     ## 
     ## Residuals:
     ##    Min     1Q Median     3Q    Max 
-    ## -26472  -2256  -1213    -79 837503 
+    ## -12309  -2036  -1020      2 226917 
     ## 
-    ## Coefficients: (8 not defined because of singularities)
-    ##                                 Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)                    4.025e+05  6.458e+06   0.062 0.950301    
-    ## n_tokens_title                 6.287e+01  3.584e+01   1.754 0.079404 .  
-    ## n_tokens_content               2.477e-01  2.773e-01   0.893 0.371695    
-    ## n_unique_tokens                3.870e+03  2.388e+03   1.620 0.105210    
-    ## n_non_stop_words              -2.331e+03  6.240e+03  -0.374 0.708772    
-    ## n_non_stop_unique_tokens      -1.048e+03  2.029e+03  -0.517 0.605468    
-    ## num_hrefs                      1.824e+01  8.287e+00   2.201 0.027728 *  
-    ## num_self_hrefs                -4.590e+01  2.222e+01  -2.066 0.038842 *  
-    ## num_imgs                       2.440e+01  1.111e+01   2.196 0.028099 *  
-    ## num_videos                    -7.215e-02  1.954e+01  -0.004 0.997054    
-    ## average_token_length          -5.780e+02  3.036e+02  -1.904 0.056937 .  
-    ## num_keywords                   6.493e+01  4.635e+01   1.401 0.161229    
-    ## data_channel_is_lifestyle     -1.183e+03  4.935e+02  -2.397 0.016557 *  
-    ## data_channel_is_entertainment -1.303e+03  3.196e+02  -4.076 4.60e-05 ***
-    ## data_channel_is_bus           -1.080e+03  4.773e+02  -2.263 0.023661 *  
-    ## data_channel_is_socmed        -1.009e+03  4.617e+02  -2.185 0.028931 *  
-    ## data_channel_is_tech          -9.391e+02  4.639e+02  -2.025 0.042910 *  
-    ## data_channel_is_world         -1.126e+03  4.713e+02  -2.389 0.016893 *  
-    ## kw_min_min                     2.774e+00  2.039e+00   1.361 0.173526    
-    ## kw_max_min                     3.659e-02  7.334e-02   0.499 0.617856    
-    ## kw_avg_min                    -2.098e-01  4.280e-01  -0.490 0.624063    
-    ## kw_min_max                    -2.893e-03  1.460e-03  -1.981 0.047592 *  
-    ## kw_max_max                    -5.280e-04  7.252e-04  -0.728 0.466615    
-    ## kw_avg_max                     3.939e-04  1.038e-03   0.379 0.704400    
-    ## kw_min_avg                    -3.304e-01  9.436e-02  -3.502 0.000463 ***
-    ## kw_max_avg                    -1.905e-01  3.146e-02  -6.056 1.41e-09 ***
-    ## kw_avg_avg                     1.543e+00  1.784e-01   8.650  < 2e-16 ***
-    ## self_reference_min_shares      3.193e-02  9.148e-03   3.490 0.000484 ***
-    ## self_reference_max_shares      1.089e-02  4.959e-03   2.196 0.028077 *  
-    ## self_reference_avg_sharess    -1.721e-02  1.264e-02  -1.361 0.173400    
-    ## weekday_is_monday              5.096e+02  3.296e+02   1.546 0.122069    
-    ## weekday_is_tuesday            -1.445e+02  3.252e+02  -0.444 0.656859    
-    ## weekday_is_wednesday          -1.550e+02  3.253e+02  -0.476 0.633781    
-    ## weekday_is_thursday           -2.838e+02  3.257e+02  -0.871 0.383620    
-    ## weekday_is_friday             -1.169e+02  3.367e+02  -0.347 0.728396    
-    ## weekday_is_saturday            6.368e+02  4.018e+02   1.585 0.113020    
-    ## weekday_is_sunday                     NA         NA      NA       NA    
-    ## is_weekend                            NA         NA      NA       NA    
-    ## LDA_00                        -4.023e+05  6.458e+06  -0.062 0.950333    
-    ## LDA_01                        -4.034e+05  6.458e+06  -0.062 0.950195    
-    ## LDA_02                        -4.031e+05  6.458e+06  -0.062 0.950229    
-    ## LDA_03                        -4.029e+05  6.458e+06  -0.062 0.950249    
-    ## LDA_04                        -4.027e+05  6.458e+06  -0.062 0.950273    
-    ## global_subjectivity            2.924e+03  1.064e+03   2.748 0.006008 ** 
-    ## global_sentiment_polarity      1.323e+03  2.068e+03   0.640 0.522451    
-    ## global_rate_positive_words    -1.650e+04  8.924e+03  -1.849 0.064446 .  
-    ## global_rate_negative_words     2.978e+03  1.717e+04   0.173 0.862306    
-    ## rate_positive_words            2.479e+03  6.040e+03   0.411 0.681435    
-    ## rate_negative_words            2.452e+03  6.110e+03   0.401 0.688217    
-    ## avg_positive_polarity         -2.010e+03  1.707e+03  -1.177 0.239075    
-    ## min_positive_polarity         -2.779e+03  1.431e+03  -1.943 0.052050 .  
-    ## max_positive_polarity          6.174e+02  5.364e+02   1.151 0.249781    
-    ## avg_negative_polarity         -1.100e+02  1.578e+03  -0.070 0.944406    
-    ## min_negative_polarity         -6.008e+02  5.747e+02  -1.045 0.295879    
-    ## max_negative_polarity         -1.017e+03  1.306e+03  -0.778 0.436342    
-    ## title_subjectivity            -1.887e+02  3.449e+02  -0.547 0.584250    
-    ## title_sentiment_polarity       1.324e+02  3.112e+02   0.426 0.670383    
-    ## abs_title_subjectivity         8.672e+02  4.562e+02   1.901 0.057308 .  
-    ## abs_title_sentiment_polarity   7.947e+02  4.945e+02   1.607 0.108087    
-    ## channelEntertainment                  NA         NA      NA       NA    
-    ## channelLifestyle                      NA         NA      NA       NA    
-    ## channelOther                          NA         NA      NA       NA    
-    ## channelSocialMedia                    NA         NA      NA       NA    
-    ## channelTech                           NA         NA      NA       NA    
-    ## channelWorld                          NA         NA      NA       NA    
+    ## Coefficients: (15 not defined because of singularities)
+    ##                                 Estimate Std. Error t value Pr(>|t|)   
+    ## (Intercept)                    3.500e+03  1.865e+03   1.876  0.06066 . 
+    ## n_tokens_title                -1.296e+01  6.031e+01  -0.215  0.82980   
+    ## n_tokens_content              -4.398e-01  5.036e-01  -0.873  0.38249   
+    ## n_unique_tokens                3.427e+03  4.071e+03   0.842  0.39997   
+    ## n_non_stop_words              -6.418e+03  8.193e+03  -0.783  0.43349   
+    ## n_non_stop_unique_tokens      -9.139e+02  3.470e+03  -0.263  0.79231   
+    ## num_hrefs                      1.183e+01  1.391e+01   0.851  0.39491   
+    ## num_self_hrefs                -2.421e+01  3.855e+01  -0.628  0.53006   
+    ## num_imgs                       1.574e+01  1.870e+01   0.842  0.39985   
+    ## num_videos                     8.255e+01  3.392e+01   2.434  0.01498 * 
+    ## average_token_length           3.572e+02  5.098e+02   0.701  0.48354   
+    ## num_keywords                   3.229e+01  7.971e+01   0.405  0.68548   
+    ## data_channel_is_lifestyle     -1.766e+03  8.603e+02  -2.053  0.04016 * 
+    ## data_channel_is_entertainment -1.591e+03  5.511e+02  -2.886  0.00392 **
+    ## data_channel_is_bus           -1.800e+03  8.221e+02  -2.190  0.02859 * 
+    ## data_channel_is_socmed        -3.531e+02  7.935e+02  -0.445  0.65634   
+    ## data_channel_is_tech          -1.012e+03  7.880e+02  -1.284  0.19929   
+    ## data_channel_is_world         -1.571e+03  7.853e+02  -2.000  0.04554 * 
+    ## kw_min_min                     4.822e-01  3.621e+00   0.133  0.89409   
+    ## kw_max_min                    -1.896e-01  1.771e-01  -1.071  0.28444   
+    ## kw_avg_min                     5.506e-01  9.978e-01   0.552  0.58112   
+    ## kw_min_max                    -5.225e-04  2.431e-03  -0.215  0.82984   
+    ## kw_max_max                    -3.951e-04  1.300e-03  -0.304  0.76112   
+    ## kw_avg_max                     3.006e-04  1.783e-03   0.169  0.86610   
+    ## kw_min_avg                    -3.839e-01  1.653e-01  -2.322  0.02026 * 
+    ## kw_max_avg                    -4.283e-02  6.209e-02  -0.690  0.49033   
+    ## kw_avg_avg                     1.010e+00  3.296e-01   3.063  0.00221 **
+    ## self_reference_min_shares      5.955e-03  1.503e-02   0.396  0.69192   
+    ## self_reference_max_shares     -4.469e-03  8.381e-03  -0.533  0.59387   
+    ## self_reference_avg_sharess     8.747e-03  2.121e-02   0.412  0.68013   
+    ## weekday_is_monday                     NA         NA      NA       NA   
+    ## weekday_is_tuesday                    NA         NA      NA       NA   
+    ## weekday_is_wednesday                  NA         NA      NA       NA   
+    ## weekday_is_thursday                   NA         NA      NA       NA   
+    ## weekday_is_friday                     NA         NA      NA       NA   
+    ## weekday_is_saturday                   NA         NA      NA       NA   
+    ## weekday_is_sunday                     NA         NA      NA       NA   
+    ## is_weekend                            NA         NA      NA       NA   
+    ## LDA_00                        -4.468e+01  9.773e+02  -0.046  0.96354   
+    ## LDA_01                        -8.641e+02  1.098e+03  -0.787  0.43116   
+    ## LDA_02                        -7.280e+02  9.728e+02  -0.748  0.45428   
+    ## LDA_03                        -8.048e+02  1.043e+03  -0.772  0.44024   
+    ## LDA_04                                NA         NA      NA       NA   
+    ## global_subjectivity            2.889e+03  1.788e+03   1.615  0.10632   
+    ## global_sentiment_polarity     -1.117e+03  3.338e+03  -0.335  0.73800   
+    ## global_rate_positive_words    -1.280e+04  1.457e+04  -0.879  0.37952   
+    ## global_rate_negative_words    -5.916e+03  2.699e+04  -0.219  0.82650   
+    ## rate_positive_words            8.821e+02  7.772e+03   0.113  0.90964   
+    ## rate_negative_words            3.711e+02  7.880e+03   0.047  0.96244   
+    ## avg_positive_polarity         -6.410e+01  2.813e+03  -0.023  0.98182   
+    ## min_positive_polarity         -2.783e+03  2.319e+03  -1.200  0.23027   
+    ## max_positive_polarity          1.063e+03  9.129e+02   1.165  0.24412   
+    ## avg_negative_polarity         -2.461e+03  2.633e+03  -0.935  0.35007   
+    ## min_negative_polarity         -3.117e+02  9.715e+02  -0.321  0.74833   
+    ## max_negative_polarity          2.676e+03  2.195e+03   1.219  0.22279   
+    ## title_subjectivity             1.988e+02  5.884e+02   0.338  0.73547   
+    ## title_sentiment_polarity       1.228e+03  5.289e+02   2.322  0.02029 * 
+    ## abs_title_subjectivity         2.165e+02  7.619e+02   0.284  0.77634   
+    ## abs_title_sentiment_polarity  -6.108e+02  8.627e+02  -0.708  0.47896   
+    ## channelEntertainment                  NA         NA      NA       NA   
+    ## channelLifestyle                      NA         NA      NA       NA   
+    ## channelOther                          NA         NA      NA       NA   
+    ## channelSocialMedia                    NA         NA      NA       NA   
+    ## channelTech                           NA         NA      NA       NA   
+    ## channelWorld                          NA         NA      NA       NA   
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 12000 on 27693 degrees of freedom
-    ## Multiple R-squared:  0.0217, Adjusted R-squared:  0.01972 
-    ## F-statistic: 10.97 on 56 and 27693 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 7655 on 3940 degrees of freedom
+    ## Multiple R-squared:  0.04743,    Adjusted R-squared:  0.03558 
+    ## F-statistic: 4.004 on 49 and 3940 DF,  p-value: < 2.2e-16
 
 The Adjusted R-square values is a very low **0.05065**, but I do see
 that the F-statistic is 6.075, with a very small p-value; it appears
@@ -648,9 +648,9 @@ compareAdjR2results
 ```
 
     ##             fitStat dataFit1 dataFit2 dataFit3 dataFit4 dataFit5 dataFit6
-    ## 1 Adjusted R Square  0.00685  0.00721  0.00721  0.00781  0.00875  0.00948
+    ## 1 Adjusted R Square  0.01801  0.01822  0.01822  0.01896  0.02049  0.02093
     ##   dataFit7 dataFit8 dataFit9 dataFit10 dataFit11 dataFitall
-    ## 1  0.00979  0.01037  0.01034   0.01038   0.01052    0.01972
+    ## 1  0.02168   0.0225  0.02261   0.02305   0.02306    0.03558
 
 ``` r
 compareAIC <- function(df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, dfall) {
@@ -676,9 +676,9 @@ compareAICresults
 ```
 
     ##             fitStat dataFit1 dataFit2 dataFit3 dataFit4 dataFit5 dataFit6
-    ## 1 Adjusted R Square 600413.2 600404.2 600404.2 600388.2   600363 600343.6
+    ## 1 Adjusted R Square 82765.59 82765.76 82765.76 82763.76 82758.51 82757.72
     ##   dataFit7 dataFit8 dataFit9 dataFit10 dataFit11 dataFitall
-    ## 1 600335.9 600321.6 600323.4  600323.4  600320.2     600106
+    ## 1 82755.66 82754.32 82754.84  82754.07  82755.01   82741.24
 
 Of all the models: **dataFitAll** has the highest Adjusted R-square
 value(0.05065) and lowest AIC (97682.44).
@@ -716,13 +716,13 @@ dataFitSignif16 <- lm(shares~n_tokens_title +
 summary(dataFitSignif16)$adj.r.square
 ```
 
-    ## [1] 0.01675043
+    ## [1] 0.03487538
 
 ``` r
 AIC(dataFitSignif16)
 ```
 
-    ## [1] 600150.1
+    ## [1] 82711.44
 
 Incorporating these 16 variables into the model reduces the adjusted
 R-square to **0.05102**, a small improvement. It also yielded a better
@@ -751,13 +751,13 @@ dataFitSignif14 <- lm(shares~n_tokens_title +
 summary(dataFitSignif14)$adj.r.square
 ```
 
-    ## [1] 0.01638469
+    ## [1] 0.03478996
 
 ``` r
 AIC(dataFitSignif14)
 ```
 
-    ## [1] 600158.4
+    ## [1] 82709.81
 
 However, even though the result returned indicates that all variables
 are significant at the alpha=0.05 level, this model reduced the Adjusted
@@ -780,14 +780,14 @@ fit11Train <- train(as.formula(dataFit11), data=newsDataTrain, method="lm", trCo
 fit11Train$results$RMSE
 ```
 
-    ## [1] 11624.78
+    ## [1] 7410.049
 
 ``` r
 fitSignif16Train <- train(as.formula(dataFitSignif16), data=newsDataTrain, method="lm", trControl=control)
 fitSignif16Train$results$RMSE
 ```
 
-    ## [1] 11410.32
+    ## [1] 7319.897
 
 I then did the same with the Test set.
 
@@ -797,14 +797,14 @@ fit11Test <- train(as.formula(dataFit11), data=newsDataTest, method="lm", trCont
 fit11Test$results$RMSE
 ```
 
-    ## [1] 9336.787
+    ## [1] 7971.706
 
 ``` r
 fitSignif16Test <- train(as.formula(dataFitSignif16), data=newsDataTest, method="lm", trControl=control)
 fitSignif16Test$results$RMSE
 ```
 
-    ## [1] 9441.047
+    ## [1] 8109.797
 
 We see that the model **fitSignif16Test** has a lower RSME for both the
 Training and Test set; therefore, when looking at our linear models, we
@@ -858,14 +858,14 @@ rfRMSE <- sqrt(mean((rfNewsDataPred-newsDataTest$shares)^2))
 rfRMSE
 ```
 
-    ## [1] 10396.75
+    ## [1] 8949.476
 
 ``` r
 datafit16RMSE <- sqrt(mean((fit16NewPred-newsDataTest$shares)^2))
 datafit16RMSE
 ```
 
-    ## [1] 10270.23
+    ## [1] 8874.317
 
 Both models have a very similar RMSE. A lower RSME is preferred; in this
 case, the linear regression model - **dataFit16** - is considered a
@@ -873,6 +873,7 @@ better fit than the random forest option.
 
 # Automation
 
-Once you’ve completed the above for Monday, adapt the code so that you
-can use a parameter in your build process that will cycle through the
-weekday\_is\_\* variables. *… adding a loop?* SEE MODULE 8
+*I was unable to complete the automation component of this assignment.
+Instead, I knit 7 separate reports.*
+
+# Conclusions
