@@ -112,7 +112,7 @@ view(newsData)
 ```
 
 ``` r
-newsData <- newsData %>% filter(weekday_is_sunday==1) #Original filtering for just Monday data.
+newsData <- newsData %>% filter(weekday_is_tuesday==1) #Original filtering for just Monday data.
 ```
 
 Per the project directions, I began by splitting the data, using
@@ -449,9 +449,9 @@ compareAdjR2results
 ```
 
     ##             fitStat dataFit1 dataFit2 dataFit3 dataFit4 dataFit5 dataFit6
-    ## 1 Adjusted R Square  0.01142  0.01128  0.01128  0.01136  0.01822  0.02595
+    ## 1 Adjusted R Square  0.01067  0.01213  0.01213  0.01364   0.0159   0.0182
     ##   dataFit7 dataFit8 dataFit9 dataFit10 dataFit11 dataFitall
-    ## 1  0.02862   0.0314  0.03128   0.03123   0.03176    0.05816
+    ## 1  0.01986  0.02085  0.02118   0.02136   0.02259    0.05078
 
 ``` r
 compareAIC <- function(df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, dfall) {
@@ -477,9 +477,9 @@ compareAICresults
 ```
 
     ##             fitStat dataFit1 dataFit2 dataFit3 dataFit4 dataFit5 dataFit6
-    ## 1 Adjusted R Square 38910.81 38912.08 38912.08 38912.92 38900.58 38886.45
+    ## 1 Adjusted R Square 107504.9 107498.3 107498.3 107491.4 107480.5 107469.4
     ##   dataFit7 dataFit8 dataFit9 dataFit10 dataFit11 dataFitall
-    ## 1 38882.18 38878.69 38879.92     38881  38880.95   38864.42
+    ## 1 107461.7 107458.4 107457.7  107457.7  107452.2   107339.6
 
 Of all the models: **dataFitAll** has the highest Adjusted R-square
 value(0.05065) and lowest AIC (97682.44).
@@ -517,13 +517,13 @@ dataFitSignif16 <- lm(shares~n_tokens_title +
 summary(dataFitSignif16)$adj.r.square
 ```
 
-    ## [1] 0.04551631
+    ## [1] 0.03908223
 
 ``` r
 AIC(dataFitSignif16)
 ```
 
-    ## [1] 38858.52
+    ## [1] 107369.2
 
 Incorporating these 16 variables into the model reduces the adjusted
 R-square to **0.05102**, a small improvement. It also yielded a better
@@ -552,13 +552,13 @@ dataFitSignif14 <- lm(shares~n_tokens_title +
 summary(dataFitSignif14)$adj.r.square
 ```
 
-    ## [1] 0.04417049
+    ## [1] 0.03631134
 
 ``` r
 AIC(dataFitSignif14)
 ```
 
-    ## [1] 38859.23
+    ## [1] 107382.1
 
 However, even though the result returned indicates that all variables
 are significant at the alpha=0.05 level, this model reduced the Adjusted
@@ -583,14 +583,14 @@ fit11Train <- train(as.formula(dataFit11), data=newsDataTrain, method="lm", trCo
 fit11Train$results$RMSE
 ```
 
-    ## [1] 6172.355
+    ## [1] 7424.068
 
 ``` r
 fitSignif16Train <- train(as.formula(dataFitSignif16), data=newsDataTrain, method="lm", trControl=control)
 fitSignif16Train$results$RMSE
 ```
 
-    ## [1] 5953.987
+    ## [1] 7529.752
 
 I then did the same with the Test set.
 
@@ -600,14 +600,14 @@ fit11Test <- train(as.formula(dataFit11), data=newsDataTest, method="lm", trCont
 fit11Test$results$RMSE
 ```
 
-    ## [1] 5549.987
+    ## [1] 10145.42
 
 ``` r
 fitSignif16Test <- train(as.formula(dataFitSignif16), data=newsDataTest, method="lm", trControl=control)
 fitSignif16Test$results$RMSE
 ```
 
-    ## [1] 5568.9
+    ## [1] 10570.28
 
 We see that the model **fitSignif16Test** has a lower RSME for both the
 Training and Test set; therefore, when looking at our linear models, we
@@ -650,7 +650,7 @@ summary(rfNewsDataPred)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##    1136    2581    3562    4020    4834   29172
+    ##     823    1971    2772    3528    4045   51333
 
 ``` r
 fit16NewPred <- predict(dataFitSignif16, newdata=newsDataTest)
@@ -658,7 +658,7 @@ summary(fit16NewPred)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   598.5  2742.0  3557.9  3766.9  4540.0 11207.7
+    ##  -879.4  2061.8  2854.5  3120.2  3918.3 12158.5
 
 ## Comparing Two Models on Test Data Set
 
@@ -672,14 +672,14 @@ rfRMSE <- sqrt(mean((rfNewsDataPred-newsDataTest$shares)^2))
 rfRMSE
 ```
 
-    ## [1] 6119.516
+    ## [1] 13324.2
 
 ``` r
 datafit16RMSE <- sqrt(mean((fit16NewPred-newsDataTest$shares)^2))
 datafit16RMSE
 ```
 
-    ## [1] 6056.581
+    ## [1] 13094.88
 
 Both models have a very similar RMSE. A lower RSME is preferred; in this
 case, the linear regression model - **dataFit16** - is considered a
