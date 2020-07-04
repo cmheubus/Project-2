@@ -1,8 +1,8 @@
-Project 2 - Trial & Error
+Project 2 - Trial & Error while Examining Mashable Data
 ================
 July 3, 2020
 
-# CONCLUSIONS
+# Links to Reports & Conclusions
 
 ## Monday
 
@@ -11,7 +11,8 @@ ensemble models. The **rfNewsDataPred** random forest (ensemble) model
 estimated that the mean number of shares for an article published on a
 Monday would be approximately 4,082; the **fit16NewPred** multiple
 linear regression model estimated that the mean would be approximately
-3,514.
+3,514. The RMSE for the linear model (23147.86) is lower than that of
+the random forest model (23204.43).
 
 The analysis for Monday is [available here](Monday.md).
 
@@ -20,7 +21,8 @@ The analysis for Monday is [available here](Monday.md).
 The **rfNewsDataPred** model predicted that the mean number of shares
 for an article published on a Tuesday would be 3,528; the
 **fit16NewPred** model predicted that the mean number of shares would be
-approximately 3,120.
+approximately 3,120. The RMSE for the linear model (13094.88) is lower
+than that of the random forest model (13324.2).
 
 The analysis for Tuesday is [available here](Tuesday.md).
 
@@ -67,9 +69,16 @@ The analysis for Saturday is [available here](Saturday.md).
 ## Sunday
 
 The **rfNewsDataPred** model predicted that the mean number of shares
-for an article published on a Saturday would be 4,020; the
+for an article published on a Sunday would be 4,020; the
 **fit16NewPred** model predicted that the mean number of shares would be
 approximately 3767. The RMSE for the linear model (6056.581) is lower
 than that of the random forest model (6119.516).
 
 The analysis for Sunday is [available here](Sunday.md).
+
+## Which Model is More Effective?
+
+Looking at the Root Mean Square Errors across the days, we can see that
+the linear model (**rfNewsDataPred**) consistently exhibits lower RMSE
+than the random forest model. Therefore, I would recommend using the
+linear model over the ensemble model.
