@@ -70,8 +70,7 @@ view(newsData)
 ```
 
 ```{r Filter by Day}
-newsData <- newsData %>% filter(weekday_is_tuesday==1) #Original filtering for just Monday data.
-#newsData <- filter(newsData, (params$day==1))
+newsData <- newsData %>% filter(weekday_is_sunday==1) #Original filtering for just Monday data.
 ```
 
 Per the project directions, I began by splitting the data, using `sample()`, with 70% of the data going to the training set (4,662 observations, **newsDataTrain**) and 30% going to the test set (1,999 observations, **newsDataTest**).
@@ -392,7 +391,7 @@ AIC(dataFitSignif14)
 However, even though the result returned indicates that all variables are significant at the alpha=0.05 level, this model reduced the Adjusted R-square to **0.05055098**. I will not be further reducing this model and would prefer to use the previous model, with the higher Adjusted R-square value (**dataFit16**).
 
 #### Comparing Root MSE 
-While the fit statistics are one way to determine which model is best, **prediction error** is actually preferred. After looking at several options, I decided to use cross-validation, per the HW 9 prediction key from Avy. With this approach, which uses 10 folds, I was able to calculate the Root Mean Square Error for the two models on the Training set.  
+While the fit statistics are one way to determine which model is best, **prediction error** is actually preferred. After looking at several options, I decided to use cross-validation, per the HW 9 prediction key from Avy. With this approach, which uses 10 folds, I was able to calculate the Root Mean Square Error for the two models on the Training set. Root MSE is a measure of the differences between predicted values and the actual observed values; when comparing numbers, a lower number means a model that's more effective at prediction. 
 
 ```{r Comparing Root MSE with Training Data}
 control <- trainControl(method="cv", number=10)

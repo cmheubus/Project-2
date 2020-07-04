@@ -112,8 +112,7 @@ view(newsData)
 ```
 
 ``` r
-newsData <- newsData %>% filter(weekday_is_tuesday==1) #Original filtering for just Monday data.
-#newsData <- filter(newsData, (params$day==1))
+newsData <- newsData %>% filter(weekday_is_sunday==1) #Original filtering for just Monday data.
 ```
 
 Per the project directions, I began by splitting the data, using
@@ -163,7 +162,7 @@ corrplot(newsCorrelation1, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation1, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20First%20Correlation%20Plot%20with%20First%2010%20Variables-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20First%20Correlation%20Plot%20with%20First%2010%20Variables-1.png)<!-- -->
 
 ## Creating Second Correlation Plot with Other Variables
 
@@ -173,7 +172,7 @@ corrplot(newsCorrelation2, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation2, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20Second%20Correlation%20Plot%20with%20Other%20Variables-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Second%20Correlation%20Plot%20with%20Other%20Variables-1.png)<!-- -->
 
 ## Creating Third Correlation Plot
 
@@ -183,7 +182,7 @@ corrplot(newsCorrelation3, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation3, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20Third%20Correlation%20Plot-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Third%20Correlation%20Plot-1.png)<!-- -->
 
 ## Creating Fourth Correlation Plot
 
@@ -193,7 +192,7 @@ corrplot(newsCorrelation4, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation4, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20Fourth%20Correlation%20Plot-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Fourth%20Correlation%20Plot-1.png)<!-- -->
 
 ## Creating Fifth Correlation Plot
 
@@ -203,7 +202,7 @@ corrplot(newsCorrelation5, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation5, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20Fifth%20Correlation%20Plot-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Fifth%20Correlation%20Plot-1.png)<!-- -->
 
 ## Creating Extra Correlation Plot
 
@@ -222,7 +221,7 @@ corrplot(newsCorrelation6, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation6, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20Correlation%20Plot%20with%20Only%20Some%20Variables-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Correlation%20Plot%20with%20Only%20Some%20Variables-1.png)<!-- -->
 
 Unfortunately,looking at these six plots, I do not see a substantial
 relationship between any one variable and the target variable of
@@ -249,7 +248,7 @@ channelsBoxplot <- ggplot(newsDataTrain, aes(x=channel, y=shares))
 channelsBoxplot + geom_boxplot()
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/Creating%20Boxplot%20of%20Shares,%20by%20Channel-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Boxplot%20of%20Shares,%20by%20Channel-1.png)<!-- -->
 
 ## Creating `ggpairs` Plots
 
@@ -261,13 +260,13 @@ in the sixth correlation plot from above.
 newsDataTrain %>% select("num_keywords", "n_tokens_title","n_tokens_content", "num_hrefs", "num_imgs", "shares") %>% ggpairs()
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/ggpairs1-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/ggpairs1-1.png)<!-- -->
 
 ``` r
 newsDataTrain %>% select("num_videos", "average_token_length", "num_keywords", "global_rate_positive_words", "global_rate_negative_words", "shares") %>% ggpairs()
 ```
 
-![](ST-558---Project-2---Heubusch_files/figure-gfm/ggpairs2-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/ggpairs2-1.png)<!-- -->
 
 # Modeling
 
@@ -450,9 +449,9 @@ compareAdjR2results
 ```
 
     ##             fitStat dataFit1 dataFit2 dataFit3 dataFit4 dataFit5 dataFit6
-    ## 1 Adjusted R Square  0.01067  0.01213  0.01213  0.01364   0.0159   0.0182
+    ## 1 Adjusted R Square  0.01142  0.01128  0.01128  0.01136  0.01822  0.02595
     ##   dataFit7 dataFit8 dataFit9 dataFit10 dataFit11 dataFitall
-    ## 1  0.01986  0.02085  0.02118   0.02136   0.02259    0.05078
+    ## 1  0.02862   0.0314  0.03128   0.03123   0.03176    0.05816
 
 ``` r
 compareAIC <- function(df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, dfall) {
@@ -478,9 +477,9 @@ compareAICresults
 ```
 
     ##             fitStat dataFit1 dataFit2 dataFit3 dataFit4 dataFit5 dataFit6
-    ## 1 Adjusted R Square 107504.9 107498.3 107498.3 107491.4 107480.5 107469.4
+    ## 1 Adjusted R Square 38910.81 38912.08 38912.08 38912.92 38900.58 38886.45
     ##   dataFit7 dataFit8 dataFit9 dataFit10 dataFit11 dataFitall
-    ## 1 107461.7 107458.4 107457.7  107457.7  107452.2   107339.6
+    ## 1 38882.18 38878.69 38879.92     38881  38880.95   38864.42
 
 Of all the models: **dataFitAll** has the highest Adjusted R-square
 value(0.05065) and lowest AIC (97682.44).
@@ -518,13 +517,13 @@ dataFitSignif16 <- lm(shares~n_tokens_title +
 summary(dataFitSignif16)$adj.r.square
 ```
 
-    ## [1] 0.03908223
+    ## [1] 0.04551631
 
 ``` r
 AIC(dataFitSignif16)
 ```
 
-    ## [1] 107369.2
+    ## [1] 38858.52
 
 Incorporating these 16 variables into the model reduces the adjusted
 R-square to **0.05102**, a small improvement. It also yielded a better
@@ -553,13 +552,13 @@ dataFitSignif14 <- lm(shares~n_tokens_title +
 summary(dataFitSignif14)$adj.r.square
 ```
 
-    ## [1] 0.03631134
+    ## [1] 0.04417049
 
 ``` r
 AIC(dataFitSignif14)
 ```
 
-    ## [1] 107382.1
+    ## [1] 38859.23
 
 However, even though the result returned indicates that all variables
 are significant at the alpha=0.05 level, this model reduced the Adjusted
@@ -574,7 +573,9 @@ While the fit statistics are one way to determine which model is best,
 options, I decided to use cross-validation, per the HW 9 prediction key
 from Avy. With this approach, which uses 10 folds, I was able to
 calculate the Root Mean Square Error for the two models on the Training
-set.
+set. Root MSE is a measure of the differences between predicted values
+and the actual observed values; when comparing numbers, a lower number
+means a model that’s more effective at prediction.
 
 ``` r
 control <- trainControl(method="cv", number=10)
@@ -582,14 +583,14 @@ fit11Train <- train(as.formula(dataFit11), data=newsDataTrain, method="lm", trCo
 fit11Train$results$RMSE
 ```
 
-    ## [1] 7424.068
+    ## [1] 6172.355
 
 ``` r
 fitSignif16Train <- train(as.formula(dataFitSignif16), data=newsDataTrain, method="lm", trControl=control)
 fitSignif16Train$results$RMSE
 ```
 
-    ## [1] 7529.752
+    ## [1] 5953.987
 
 I then did the same with the Test set.
 
@@ -599,14 +600,14 @@ fit11Test <- train(as.formula(dataFit11), data=newsDataTest, method="lm", trCont
 fit11Test$results$RMSE
 ```
 
-    ## [1] 10145.42
+    ## [1] 5549.987
 
 ``` r
 fitSignif16Test <- train(as.formula(dataFitSignif16), data=newsDataTest, method="lm", trControl=control)
 fitSignif16Test$results$RMSE
 ```
 
-    ## [1] 10570.28
+    ## [1] 5568.9
 
 We see that the model **fitSignif16Test** has a lower RSME for both the
 Training and Test set; therefore, when looking at our linear models, we
@@ -649,7 +650,7 @@ summary(rfNewsDataPred)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##     823    1971    2772    3528    4045   51333
+    ##    1136    2581    3562    4020    4834   29172
 
 ``` r
 fit16NewPred <- predict(dataFitSignif16, newdata=newsDataTest)
@@ -657,7 +658,7 @@ summary(fit16NewPred)
 ```
 
     ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##  -879.4  2061.8  2854.5  3120.2  3918.3 12158.5
+    ##   598.5  2742.0  3557.9  3766.9  4540.0 11207.7
 
 ## Comparing Two Models on Test Data Set
 
@@ -671,14 +672,14 @@ rfRMSE <- sqrt(mean((rfNewsDataPred-newsDataTest$shares)^2))
 rfRMSE
 ```
 
-    ## [1] 13324.2
+    ## [1] 6119.516
 
 ``` r
 datafit16RMSE <- sqrt(mean((fit16NewPred-newsDataTest$shares)^2))
 datafit16RMSE
 ```
 
-    ## [1] 13094.88
+    ## [1] 6056.581
 
 Both models have a very similar RMSE. A lower RSME is preferred; in this
 case, the linear regression model - **dataFit16** - is considered a
