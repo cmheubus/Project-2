@@ -1,5 +1,4 @@
-README
-================
-July 3, 2020
+<<<<<<< HEAD
+# Project-2
 
-paste(“The analysis for Monday is [available here](Monday.md).”)
+The link to my 
