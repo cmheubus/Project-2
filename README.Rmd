@@ -1,5 +1,5 @@
 ---
-title: "Project 2 - ST 558 - CM Heubusch"
+title: "Project 2 - ST 558 - CM Heubusch 2"
 date: "July 3, 2020"
 output: rmarkdown::github_document
 

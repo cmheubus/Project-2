@@ -1,13 +1,23 @@
 <<<<<<< HEAD
 # Project-2
 
+library(tidyverse)
 
-rmarkdown::render("/Users/christinemarieheubusch/Project-2/Project 2 - ST 558 - CM Heubusch.Rmd", output_file="test123.html", params=list(day=c("Monday","Tuesday","Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+for ({
+unique(select(starts_with("weekday_is_*")==1)
+
+}
+
+rmarkdown::render(input="/Users/christinemarieheubusch/Project-2/Project 2 - ST 558 - CM Heubusch.Rmd",
+  params=list(day=dplyr::select(starts_with("weekday_is_"))),
+  output_format=".md",
+  output_file=paste0(gsub(".md","", day), ".md"))
 
 
-dayWeek <- newsData %>% select(starts_with("weekday_is_"))
+## Getting unique columns
+dayWeek <- newsData %>% unique(select(starts_with("weekday_is_*")==1))
 output_file <- paste0(dayWeek, ".md")
-params = lapply(dayWeek, FUN=function(x){list(day=x)})
+params = lapply(dayWeek, FUN=function(x){list(*=x)})
 
 #Placing the params list into a dataframe - each element within each column will be a list.
 reports <- tibble(output_file, params) 
