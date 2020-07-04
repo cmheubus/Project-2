@@ -1,5 +1,7 @@
 ---
 title: "README"
+date: "July 3, 2020"
+output: rmarkdown::github_document
 ---
 
-paste("The analysis for Monday is [available here](www.google.com])")
+paste("The analysis for Monday is [available here](Monday.md).")
