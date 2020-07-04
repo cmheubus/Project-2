@@ -26,6 +26,7 @@ I then utilized the `caret` package to create a random forest. Per the class not
 
 ## Describing the Data & Variables
 In total, the data set consists of 39,644 observations, with 61 columns of different variables. In examining the variables, I was particularly intrigued by the following, simply based upon my limited knowledge of the media industry:  
+
 * n_tokens_title - *"number of words in the title"*  
 * n_tokens_content - *"number of words in the content"*  
 * num_hrefs - *"number of links" in the article*  
@@ -45,8 +46,6 @@ The **weekday_is_** variables will be our means of creating seven separate repor
 newsData <- read.csv(file="/Users/christinemarieheubusch/Project-2/OnlineNewsPopularity/OnlineNewsPopularity.csv")
 #Removing URL and timedelta columns, since these variables are non-predictive.
 newsData <- newsData %>% select(-url, -timedelta)
-#str(newsData)
-head(newsData)
 ```
 
 ## Creating New Column Using `Mutate`
@@ -71,7 +70,7 @@ view(newsData)
 ```
 
 ```{r Filter by Day}
-newsData <- newsData %>% filter(weekday_is_monday==1) #Original filtering for just Monday data.
+newsData <- newsData %>% filter(weekday_is_tuesday==1) #Original filtering for just Monday data.
 #newsData <- filter(newsData, (params$day==1))
 ```
 
@@ -89,14 +88,13 @@ newsDataTest <- newsData[test,]
 Now let's see if any of the variables that intrigued me should be included in my multiple linear regression.
 
 # Summarizations
-*You should produce some basic (but meaningful) summary statistics about the training data you are working
-with. The GENERAL things that the plots describe should be explained but, since we are going to automate
-things, there is no need to try and explain particular trends in the plots you see (unless you want to try and
-automate that too!).*
 
 ## Calculating Summary Statistics for Variables
 I then used the `summary()` function to calculate summary statistics for each of the quantitative variables in the dataset, including Min, 1st Quartile, Median, Mean, 3rd Quartile, and Max. For the one categorical variable I created (**channel**), it has calculated the frequency of each type of channel. 
 
+```{r Basic Summary Data, results='hide'}
+summary(newsData)
+```
 
 I further explored the data by looking at a correlations plot with the variables I had expressed interest in previously. I divided the variables into different chunks, to make the plots easier to view. I excluded **weekday_is** variables, as I felt they would only be used for the final creation of the reports, as opposed to being involved in the model. I used the code from our notes *(Module 7 - Summarizing Data/Quantitative Summaries)* for this purpose. 
 ## Creating First Correlation Plot with First 10 Variables
@@ -168,9 +166,10 @@ To begin, I wanted to first establish a better understanding of what the model w
 ### Creating Model with All Main Effects
 ```{r}
 dataFitAll <- lm(shares~., data=newsDataTrain) 
-summary(dataFitAll)
+#summary(dataFitAll)
 ```
 The Adjusted R-square values is a very low **0.05065**, but I do see that the F-statistic is 6.075, with a very small p-value; it appears that the F-test is significant, in turn suggesting that the model is significant. With an alpha value of 0.01, the following variables are considered significant:
+
 * n_tokens_title  
 * num_hrefs  
 * num_imgs  
@@ -192,6 +191,7 @@ The Adjusted R-square values is a very low **0.05065**, but I do see that the F-
 **However**, since we have not focused on this tactic for selecting variables, I decided to forgo this particular approach, and focus instead upon the correlations that I found in my summarization above. Though all these corrlations were very weak, I'm going to experiment with several different combinations of variables that exhibited the highest correlations to our target variable of shares. I tried not to include variables that were related or otherwise correlated with one another, such as min_negative_polarity or max_negative_polarity; in this case, I instead just chose to include avg_negative_polarity.
 
 The variables, in descending correlation coefficient, were as follows: 
+
 * LDA_03, with a correlation coefficient of 0.07  
 * avg_negative_polarity, -0.06  
 * kw_avg_max, 0.06  
@@ -430,11 +430,12 @@ rfNewsDataFit <- randomForest(shares~., data=newsDataTrain, mtry=ncol(newsDataTr
 
 ```{r Predicting Using the Random Forest Model}
 rfNewsDataPred <- predict(rfNewsDataFit, newdata=newsDataTest)
+summary(rfNewsDataPred) 
 fit16NewPred <- predict(dataFitSignif16, newdata=newsDataTest)
+summary(fit16NewPred)
 ```
 
 ## Comparing Two Models on Test Data Set
-
 I compared the random forest model to  to our linear model from before, **dataFit16**. To compare the two models and determine which is preferrable, I calculated the root MSE values on the Test dataset that I created earlier. 
 ```{r Calculating Root MSE values}
 rfRMSE <- sqrt(mean((rfNewsDataPred-newsDataTest$shares)^2))
@@ -446,8 +447,6 @@ datafit16RMSE
 
 Both models have a very similar RMSE. A lower RSME is preferred; in this case, the linear regression model - **dataFit16** - is considered a better fit than the random forest option.
 
-# Automation
-*I was unable to complete the automation component of this assignment. Instead, I knit 7 separate reports.*
-
-# Conclusions
+# Automation & Conclusions
+*I was unable to complete the automation component of this assignment. Instead, I knit 7 separate reports. I included conclusions about each of the sets on my Project-2 [GitHub Pages site](https://cmheubus.github.io/Project-2/).*
 
