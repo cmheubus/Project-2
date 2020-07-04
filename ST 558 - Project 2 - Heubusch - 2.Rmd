@@ -71,7 +71,7 @@ view(newsData)
 
 ```{r Filter by Day}
 #Original filtering for just Monday data. I did not manage to automate my reports, so I generated separate reports manually using this filter. 
-newsData <- newsData %>% filter(weekday_is_monday==1) 
+newsData <- newsData %>% filter(weekday_is_sunday==1) 
 ```
 
 Per the project directions, I began by splitting the data, using `sample()`, with 70% of the data going to the training set (4,662 observations, **newsDataTrain**) and 30% going to the test set (1,999 observations, **newsDataTest**).

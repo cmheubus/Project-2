@@ -36,24 +36,26 @@ subset of predictors for each bootstrap sample/tree fit”.
 In total, the data set consists of 39,644 observations, with 61 columns
 of different variables. In examining the variables, I was particularly
 intrigued by the following, simply based upon my limited knowledge of
-the media industry:  
-\* n\_tokens\_title - *“number of words in the title”*  
-\* n\_tokens\_content - *“number of words in the content”*  
-\* num\_hrefs - *“number of links” in the article*  
-\* num\_imgs - *“number of images”*  
-\* num\_videos - *“number of videos”*  
-\* average\_token\_length - *average word length in the article* \*
-num\_keywords - *how many keywords are included in the metadata, an
-important factor for search engine optimization* \*
-data\_channel\_is\_\* variables - *six binary variables, indicating
-whether the observation is included in a particular channel. Each
-article appears to only be attributed to either one channel, or no
-channel/another channel (perhaps smaller) that was not accounted for
-with these binary variables*  
-\* global\_rate\_positive\_words - *“rate of positive words in the
-content,” or rather, the ratio of positive:total words in the article*  
-\* global\_rate\_negative\_words - *“rate of negative words in the
-content,” the complement to global\_rate\_positive\_words*
+the media industry:
+
+  - n\_tokens\_title - *“number of words in the title”*  
+  - n\_tokens\_content - *“number of words in the content”*  
+  - num\_hrefs - *“number of links” in the article*  
+  - num\_imgs - *“number of images”*  
+  - num\_videos - *“number of videos”*  
+  - average\_token\_length - *average word length in the article*
+  - num\_keywords - *how many keywords are included in the metadata, an
+    important factor for search engine optimization*
+  - data\_channel\_is\_\* variables - *six binary variables, indicating
+    whether the observation is included in a particular channel. Each
+    article appears to only be attributed to either one channel, or no
+    channel/another channel (perhaps smaller) that was not accounted for
+    with these binary variables*  
+  - global\_rate\_positive\_words - *“rate of positive words in the
+    content,” or rather, the ratio of positive:total words in the
+    article*  
+  - global\_rate\_negative\_words - *“rate of negative words in the
+    content,” the complement to global\_rate\_positive\_words*
 
 The **weekday\_is\_** variables will be our means of creating seven
 separate reports. They are binary variables, so their value is either 0
@@ -67,129 +69,7 @@ day). **weekday\_is\_weekend** is 1 if the article was published on
 newsData <- read.csv(file="/Users/christinemarieheubusch/Project-2/OnlineNewsPopularity/OnlineNewsPopularity.csv")
 #Removing URL and timedelta columns, since these variables are non-predictive.
 newsData <- newsData %>% select(-url, -timedelta)
-#str(newsData)
-head(newsData)
 ```
-
-    ##   n_tokens_title n_tokens_content n_unique_tokens n_non_stop_words
-    ## 1              8             2509       0.3488781                1
-    ## 2             13             1629       0.4257106                1
-    ## 3             11              223       0.6531531                1
-    ## 4             11              346       0.5290520                1
-    ## 5             12              328       0.6962963                1
-    ## 6             10              442       0.5163551                1
-    ##   n_non_stop_unique_tokens num_hrefs num_self_hrefs num_imgs num_videos
-    ## 1                0.4649235        23              1       10          0
-    ## 2                0.6060924        15             12        6          0
-    ## 3                0.8257576         5              3        1          0
-    ## 4                0.6847826         9              7        1          1
-    ## 5                0.8850575         9              7        3         48
-    ## 6                0.6441281        24              1       12          1
-    ##   average_token_length num_keywords data_channel_is_lifestyle
-    ## 1             4.569550           10                         1
-    ## 2             4.552486            8                         0
-    ## 3             4.923767            6                         0
-    ## 4             4.523121            8                         0
-    ## 5             4.405488            7                         0
-    ## 6             5.076923            8                         0
-    ##   data_channel_is_entertainment data_channel_is_bus data_channel_is_socmed
-    ## 1                             0                   0                      0
-    ## 2                             1                   0                      0
-    ## 3                             0                   1                      0
-    ## 4                             0                   0                      0
-    ## 5                             0                   0                      1
-    ## 6                             0                   0                      0
-    ##   data_channel_is_tech data_channel_is_world kw_min_min kw_max_min kw_avg_min
-    ## 1                    0                     0         -1        646    152.300
-    ## 2                    0                     0         -1       1100    354.000
-    ## 3                    0                     0         -1        459     91.000
-    ## 4                    1                     0         -1        671    173.125
-    ## 5                    0                     0         -1        616    184.000
-    ## 6                    0                     0         -1        691    168.250
-    ##   kw_min_max kw_max_max kw_avg_max kw_min_avg kw_max_avg kw_avg_avg
-    ## 1      31000     843300   275140.0   2990.745   6880.687   4349.053
-    ## 2       1500     843300   200800.0   1300.000   4288.894   2746.804
-    ## 3          0     843300   484083.3      0.000   4301.332   2665.713
-    ## 4      26900     843300   374962.5   2514.743   4004.343   3031.116
-    ## 5       6500     843300   192985.7   1664.268   5470.169   3411.661
-    ## 6       6200     843300   295850.0   1753.882   6880.687   4206.439
-    ##   self_reference_min_shares self_reference_max_shares
-    ## 1                      4900                      4900
-    ## 2                       857                     16900
-    ## 3                      2000                      5700
-    ## 4                     11400                     48000
-    ## 5                      2100                      2100
-    ## 6                      1400                      1400
-    ##   self_reference_avg_sharess weekday_is_monday weekday_is_tuesday
-    ## 1                   4900.000                 0                  0
-    ## 2                   5181.417                 0                  0
-    ## 3                   3633.333                 0                  0
-    ## 4                  37033.333                 0                  0
-    ## 5                   2100.000                 0                  0
-    ## 6                   1400.000                 0                  0
-    ##   weekday_is_wednesday weekday_is_thursday weekday_is_friday
-    ## 1                    1                   0                 0
-    ## 2                    1                   0                 0
-    ## 3                    1                   0                 0
-    ## 4                    1                   0                 0
-    ## 5                    1                   0                 0
-    ## 6                    1                   0                 0
-    ##   weekday_is_saturday weekday_is_sunday is_weekend     LDA_00     LDA_01
-    ## 1                   0                 0          0 0.16555103 0.02001286
-    ## 2                   0                 0          0 0.02500044 0.76894522
-    ## 3                   0                 0          0 0.55133809 0.03333719
-    ## 4                   0                 0          0 0.02503777 0.02500062
-    ## 5                   0                 0          0 0.02934870 0.02857493
-    ## 6                   0                 0          0 0.15900446 0.02502466
-    ##       LDA_02     LDA_03     LDA_04 global_subjectivity
-    ## 1 0.02000092 0.35418710 0.44024809           0.4835354
-    ## 2 0.02548047 0.15557371 0.02500016           0.4401519
-    ## 3 0.03334721 0.03333504 0.34864248           0.5520408
-    ## 4 0.15170116 0.02500011 0.77326035           0.4826786
-    ## 5 0.23186607 0.68163487 0.02857542           0.5643743
-    ## 6 0.02520734 0.64379353 0.14697000           0.5102958
-    ##   global_sentiment_polarity global_rate_positive_words
-    ## 1                0.07970628                 0.02670387
-    ## 2                0.10542398                 0.04665439
-    ## 3                0.26887755                 0.03139013
-    ## 4                0.14196429                 0.03757225
-    ## 5                0.19424931                 0.03963415
-    ## 6                0.02460859                 0.03393665
-    ##   global_rate_negative_words rate_positive_words rate_negative_words
-    ## 1                0.021123954           0.5583333           0.4416667
-    ## 2                0.020871700           0.6909091           0.3090909
-    ## 3                0.004484305           0.8750000           0.1250000
-    ## 4                0.014450867           0.7222222           0.2777778
-    ## 5                0.009146341           0.8125000           0.1875000
-    ## 6                0.024886878           0.5769231           0.4230769
-    ##   avg_positive_polarity min_positive_polarity max_positive_polarity
-    ## 1             0.3518708            0.10000000                  1.00
-    ## 2             0.4595395            0.03333333                  1.00
-    ## 3             0.5734694            0.21428571                  0.80
-    ## 4             0.3337912            0.10000000                  0.75
-    ## 5             0.3748252            0.13636364                  0.70
-    ## 6             0.3072727            0.13636364                  0.50
-    ##   avg_negative_polarity min_negative_polarity max_negative_polarity
-    ## 1            -0.2316115                 -0.60            -0.0500000
-    ## 2            -0.4295343                 -1.00            -0.0500000
-    ## 3            -0.2500000                 -0.25            -0.2500000
-    ## 4            -0.2600000                 -0.50            -0.1250000
-    ## 5            -0.2111111                 -0.40            -0.1000000
-    ## 6            -0.3564394                 -0.80            -0.1666667
-    ##   title_subjectivity title_sentiment_polarity abs_title_subjectivity
-    ## 1          0.0000000                0.0000000             0.50000000
-    ## 2          0.7833333               -0.6000000             0.28333333
-    ## 3          0.0000000                0.0000000             0.50000000
-    ## 4          0.1000000                0.0000000             0.40000000
-    ## 5          0.3000000                1.0000000             0.20000000
-    ## 6          0.4545455                0.1363636             0.04545454
-    ##   abs_title_sentiment_polarity shares
-    ## 1                    0.0000000   1700
-    ## 2                    0.6000000   1400
-    ## 3                    0.0000000   1200
-    ## 4                    0.0000000   1800
-    ## 5                    1.0000000   1900
-    ## 6                    0.1363636   1900
 
 ## Creating New Column Using `Mutate`
 
@@ -232,8 +112,8 @@ view(newsData)
 ```
 
 ``` r
-newsData <- newsData %>% filter(weekday_is_friday==1) #Original filtering for just Monday data.
-#newsData <- filter(newsData, (params$day==1))
+#Original filtering for just Monday data. I did not manage to automate my reports, so I generated separate reports manually using this filter. 
+newsData <- newsData %>% filter(weekday_is_friday==1) 
 ```
 
 Per the project directions, I began by splitting the data, using
@@ -256,12 +136,6 @@ included in my multiple linear regression.
 
 # Summarizations
 
-*You should produce some basic (but meaningful) summary statistics about
-the training data you are working with. The GENERAL things that the
-plots describe should be explained but, since we are going to automate
-things, there is no need to try and explain particular trends in the
-plots you see (unless you want to try and automate that too\!).*
-
 ## Calculating Summary Statistics for Variables
 
 I then used the `summary()` function to calculate summary statistics for
@@ -269,6 +143,10 @@ each of the quantitative variables in the dataset, including Min, 1st
 Quartile, Median, Mean, 3rd Quartile, and Max. For the one categorical
 variable I created (**channel**), it has calculated the frequency of
 each type of channel.
+
+``` r
+summary(newsData)
+```
 
 I further explored the data by looking at a correlations plot with the
 variables I had expressed interest in previously. I divided the
@@ -285,7 +163,7 @@ corrplot(newsCorrelation1, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation1, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20First%20Correlation%20Plot%20with%20First%2010%20Variables-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20First%20Correlation%20Plot%20with%20First%2010%20Variables-1.png)<!-- -->
 
 ## Creating Second Correlation Plot with Other Variables
 
@@ -295,7 +173,7 @@ corrplot(newsCorrelation2, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation2, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20Second%20Correlation%20Plot%20with%20Other%20Variables-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Second%20Correlation%20Plot%20with%20Other%20Variables-1.png)<!-- -->
 
 ## Creating Third Correlation Plot
 
@@ -305,7 +183,7 @@ corrplot(newsCorrelation3, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation3, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20Third%20Correlation%20Plot-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Third%20Correlation%20Plot-1.png)<!-- -->
 
 ## Creating Fourth Correlation Plot
 
@@ -315,7 +193,7 @@ corrplot(newsCorrelation4, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation4, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20Fourth%20Correlation%20Plot-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Fourth%20Correlation%20Plot-1.png)<!-- -->
 
 ## Creating Fifth Correlation Plot
 
@@ -325,7 +203,7 @@ corrplot(newsCorrelation5, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation5, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20Fifth%20Correlation%20Plot-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Fifth%20Correlation%20Plot-1.png)<!-- -->
 
 ## Creating Extra Correlation Plot
 
@@ -344,7 +222,7 @@ corrplot(newsCorrelation6, type="upper", method="number", tl.pos="lt", number.ce
 corrplot(newsCorrelation6, type="lower", add=TRUE, tl.pos="n", number.cex=0.5)
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20Correlation%20Plot%20with%20Only%20Some%20Variables-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Correlation%20Plot%20with%20Only%20Some%20Variables-1.png)<!-- -->
 
 Unfortunately,looking at these six plots, I do not see a substantial
 relationship between any one variable and the target variable of
@@ -371,7 +249,7 @@ channelsBoxplot <- ggplot(newsDataTrain, aes(x=channel, y=shares))
 channelsBoxplot + geom_boxplot()
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/Creating%20Boxplot%20of%20Shares,%20by%20Channel-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/Creating%20Boxplot%20of%20Shares,%20by%20Channel-1.png)<!-- -->
 
 ## Creating `ggpairs` Plots
 
@@ -383,13 +261,13 @@ in the sixth correlation plot from above.
 newsDataTrain %>% select("num_keywords", "n_tokens_title","n_tokens_content", "num_hrefs", "num_imgs", "shares") %>% ggpairs()
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/ggpairs1-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/ggpairs1-1.png)<!-- -->
 
 ``` r
 newsDataTrain %>% select("num_videos", "average_token_length", "num_keywords", "global_rate_positive_words", "global_rate_negative_words", "shares") %>% ggpairs()
 ```
 
-![](Project-2---ST-558---CM-Heubusch-2_files/figure-gfm/ggpairs2-1.png)<!-- -->
+![](ST-558---Project-2---Heubusch---2_files/figure-gfm/ggpairs2-1.png)<!-- -->
 
 # Modeling
 
@@ -403,109 +281,32 @@ excluding any interactions or quadratic terms.
 
 ``` r
 dataFitAll <- lm(shares~., data=newsDataTrain) 
-summary(dataFitAll)
+#summary(dataFitAll)
 ```
-
-    ## 
-    ## Call:
-    ## lm(formula = shares ~ ., data = newsDataTrain)
-    ## 
-    ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -12309  -2036  -1020      2 226917 
-    ## 
-    ## Coefficients: (15 not defined because of singularities)
-    ##                                 Estimate Std. Error t value Pr(>|t|)   
-    ## (Intercept)                    3.500e+03  1.865e+03   1.876  0.06066 . 
-    ## n_tokens_title                -1.296e+01  6.031e+01  -0.215  0.82980   
-    ## n_tokens_content              -4.398e-01  5.036e-01  -0.873  0.38249   
-    ## n_unique_tokens                3.427e+03  4.071e+03   0.842  0.39997   
-    ## n_non_stop_words              -6.418e+03  8.193e+03  -0.783  0.43349   
-    ## n_non_stop_unique_tokens      -9.139e+02  3.470e+03  -0.263  0.79231   
-    ## num_hrefs                      1.183e+01  1.391e+01   0.851  0.39491   
-    ## num_self_hrefs                -2.421e+01  3.855e+01  -0.628  0.53006   
-    ## num_imgs                       1.574e+01  1.870e+01   0.842  0.39985   
-    ## num_videos                     8.255e+01  3.392e+01   2.434  0.01498 * 
-    ## average_token_length           3.572e+02  5.098e+02   0.701  0.48354   
-    ## num_keywords                   3.229e+01  7.971e+01   0.405  0.68548   
-    ## data_channel_is_lifestyle     -1.766e+03  8.603e+02  -2.053  0.04016 * 
-    ## data_channel_is_entertainment -1.591e+03  5.511e+02  -2.886  0.00392 **
-    ## data_channel_is_bus           -1.800e+03  8.221e+02  -2.190  0.02859 * 
-    ## data_channel_is_socmed        -3.531e+02  7.935e+02  -0.445  0.65634   
-    ## data_channel_is_tech          -1.012e+03  7.880e+02  -1.284  0.19929   
-    ## data_channel_is_world         -1.571e+03  7.853e+02  -2.000  0.04554 * 
-    ## kw_min_min                     4.822e-01  3.621e+00   0.133  0.89409   
-    ## kw_max_min                    -1.896e-01  1.771e-01  -1.071  0.28444   
-    ## kw_avg_min                     5.506e-01  9.978e-01   0.552  0.58112   
-    ## kw_min_max                    -5.225e-04  2.431e-03  -0.215  0.82984   
-    ## kw_max_max                    -3.951e-04  1.300e-03  -0.304  0.76112   
-    ## kw_avg_max                     3.006e-04  1.783e-03   0.169  0.86610   
-    ## kw_min_avg                    -3.839e-01  1.653e-01  -2.322  0.02026 * 
-    ## kw_max_avg                    -4.283e-02  6.209e-02  -0.690  0.49033   
-    ## kw_avg_avg                     1.010e+00  3.296e-01   3.063  0.00221 **
-    ## self_reference_min_shares      5.955e-03  1.503e-02   0.396  0.69192   
-    ## self_reference_max_shares     -4.469e-03  8.381e-03  -0.533  0.59387   
-    ## self_reference_avg_sharess     8.747e-03  2.121e-02   0.412  0.68013   
-    ## weekday_is_monday                     NA         NA      NA       NA   
-    ## weekday_is_tuesday                    NA         NA      NA       NA   
-    ## weekday_is_wednesday                  NA         NA      NA       NA   
-    ## weekday_is_thursday                   NA         NA      NA       NA   
-    ## weekday_is_friday                     NA         NA      NA       NA   
-    ## weekday_is_saturday                   NA         NA      NA       NA   
-    ## weekday_is_sunday                     NA         NA      NA       NA   
-    ## is_weekend                            NA         NA      NA       NA   
-    ## LDA_00                        -4.468e+01  9.773e+02  -0.046  0.96354   
-    ## LDA_01                        -8.641e+02  1.098e+03  -0.787  0.43116   
-    ## LDA_02                        -7.280e+02  9.728e+02  -0.748  0.45428   
-    ## LDA_03                        -8.048e+02  1.043e+03  -0.772  0.44024   
-    ## LDA_04                                NA         NA      NA       NA   
-    ## global_subjectivity            2.889e+03  1.788e+03   1.615  0.10632   
-    ## global_sentiment_polarity     -1.117e+03  3.338e+03  -0.335  0.73800   
-    ## global_rate_positive_words    -1.280e+04  1.457e+04  -0.879  0.37952   
-    ## global_rate_negative_words    -5.916e+03  2.699e+04  -0.219  0.82650   
-    ## rate_positive_words            8.821e+02  7.772e+03   0.113  0.90964   
-    ## rate_negative_words            3.711e+02  7.880e+03   0.047  0.96244   
-    ## avg_positive_polarity         -6.410e+01  2.813e+03  -0.023  0.98182   
-    ## min_positive_polarity         -2.783e+03  2.319e+03  -1.200  0.23027   
-    ## max_positive_polarity          1.063e+03  9.129e+02   1.165  0.24412   
-    ## avg_negative_polarity         -2.461e+03  2.633e+03  -0.935  0.35007   
-    ## min_negative_polarity         -3.117e+02  9.715e+02  -0.321  0.74833   
-    ## max_negative_polarity          2.676e+03  2.195e+03   1.219  0.22279   
-    ## title_subjectivity             1.988e+02  5.884e+02   0.338  0.73547   
-    ## title_sentiment_polarity       1.228e+03  5.289e+02   2.322  0.02029 * 
-    ## abs_title_subjectivity         2.165e+02  7.619e+02   0.284  0.77634   
-    ## abs_title_sentiment_polarity  -6.108e+02  8.627e+02  -0.708  0.47896   
-    ## channelEntertainment                  NA         NA      NA       NA   
-    ## channelLifestyle                      NA         NA      NA       NA   
-    ## channelOther                          NA         NA      NA       NA   
-    ## channelSocialMedia                    NA         NA      NA       NA   
-    ## channelTech                           NA         NA      NA       NA   
-    ## channelWorld                          NA         NA      NA       NA   
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 7655 on 3940 degrees of freedom
-    ## Multiple R-squared:  0.04743,    Adjusted R-squared:  0.03558 
-    ## F-statistic: 4.004 on 49 and 3940 DF,  p-value: < 2.2e-16
 
 The Adjusted R-square values is a very low **0.05065**, but I do see
 that the F-statistic is 6.075, with a very small p-value; it appears
 that the F-test is significant, in turn suggesting that the model is
 significant. With an alpha value of 0.01, the following variables are
-considered significant: \* n\_tokens\_title  
-\* num\_hrefs  
-\* num\_imgs  
-\* average\_token\_length  
-\* kw\_avg\_max \* kw\_min\_avg \* kw\_max\_avg  
-\* kw\_avg\_avg \* LDA\_00  
-\* global\_subjectivity  
-\* min\_positive\_polarity  
-\* data\_channel\_is\_lifestyle  
-\* data\_channel\_is\_entertainment  
-\* data\_channel\_is\_bus  
-\* data\_channel\_is\_socmed  
-\* data\_channel\_is\_tech  
-\* data\_channel\_is\_world
+considered significant:
+
+  - n\_tokens\_title  
+  - num\_hrefs  
+  - num\_imgs  
+  - average\_token\_length  
+  - kw\_avg\_max
+  - kw\_min\_avg
+  - kw\_max\_avg  
+  - kw\_avg\_avg
+  - LDA\_00  
+  - global\_subjectivity  
+  - min\_positive\_polarity  
+  - data\_channel\_is\_lifestyle  
+  - data\_channel\_is\_entertainment  
+  - data\_channel\_is\_bus  
+  - data\_channel\_is\_socmed  
+  - data\_channel\_is\_tech  
+  - data\_channel\_is\_world
 
 **However**, since we have not focused on this tactic for selecting
 variables, I decided to forgo this particular approach, and focus
@@ -518,17 +319,18 @@ another, such as min\_negative\_polarity or max\_negative\_polarity; in
 this case, I instead just chose to include avg\_negative\_polarity.
 
 The variables, in descending correlation coefficient, were as follows:
-\* LDA\_03, with a correlation coefficient of 0.07  
-\* avg\_negative\_polarity, -0.06  
-\* kw\_avg\_max, 0.06  
-\* LDA\_02, -0.05  
-\* data\_channel\_is\_world, -0.04 … *For now, I decided * num\_hrefs,
-0.032  
-\* average\_token\_length, -0.030  
-\* global\_subjectivity, 0.030  
-\* LDA\_04, -0.030  
-\* num\_videos, 0.028  
-\* num\_imgs, 0.023
+
+  - LDA\_03, with a correlation coefficient of 0.07  
+  - avg\_negative\_polarity, -0.06  
+  - kw\_avg\_max, 0.06  
+  - LDA\_02, -0.05  
+  - data\_channel\_is\_world, -0.04 … \*For now, I decided
+  - num\_hrefs, 0.032  
+  - average\_token\_length, -0.030  
+  - global\_subjectivity, 0.030  
+  - LDA\_04, -0.030  
+  - num\_videos, 0.028  
+  - num\_imgs, 0.023
 
 ### Creating Linear Regression Models
 
@@ -772,7 +574,9 @@ While the fit statistics are one way to determine which model is best,
 options, I decided to use cross-validation, per the HW 9 prediction key
 from Avy. With this approach, which uses 10 folds, I was able to
 calculate the Root Mean Square Error for the two models on the Training
-set.
+set. Root MSE is a measure of the differences between predicted values
+and the actual observed values; when comparing numbers, a lower number
+means a model that’s more effective at prediction.
 
 ``` r
 control <- trainControl(method="cv", number=10)
@@ -843,8 +647,19 @@ rfNewsDataFit <- randomForest(shares~., data=newsDataTrain, mtry=ncol(newsDataTr
 
 ``` r
 rfNewsDataPred <- predict(rfNewsDataFit, newdata=newsDataTest)
-fit16NewPred <- predict(dataFitSignif16, newdata=newsDataTest)
+summary(rfNewsDataPred) 
 ```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##     940    2081    2924    3747    4405   27240
+
+``` r
+fit16NewPred <- predict(dataFitSignif16, newdata=newsDataTest)
+summary(fit16NewPred)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   286.7  2152.4  2772.6  3268.1  3810.8 29318.3
 
 ## Comparing Two Models on Test Data Set
 
@@ -871,9 +686,9 @@ Both models have a very similar RMSE. A lower RSME is preferred; in this
 case, the linear regression model - **dataFit16** - is considered a
 better fit than the random forest option.
 
-# Automation
+# Automation & Conclusions
 
 *I was unable to complete the automation component of this assignment.
-Instead, I knit 7 separate reports.*
-
-# Conclusions
+Instead, I knit 7 separate reports. I included conclusions about each of
+the sets on my Project-2 [GitHub Pages
+site](https://cmheubus.github.io/Project-2/).*
