@@ -3,7 +3,7 @@ title: "Project 2 - Trial & Error"
 date: "July 3, 2020"
 output: rmarkdown::github_document
 ---
-# CONCLUSIONS
+# Links to Reports & Conclusions
 ## Monday
 I calculated the mean of the predictions for both the linear and ensemble models. The **rfNewsDataPred** random forest (ensemble) model estimated that the mean number of shares for an article published on a Monday would be approximately 4,082; the **fit16NewPred** multiple linear regression model estimated that the mean would be approximately 3,514. The RMSE for the linear model (23147.86) is lower than that of the random forest model (23204.43).
 
